@@ -1,0 +1,22 @@
+Allows you to send email using Amazon Ses
+
+application.conf should contain a line: include "mail.conf"
+
+mail.conf should contain the following information:
+
+mail.smtp.host="smtp.host.com"
+mail.smtp.port=25
+mail.smtp.username=""
+mail.smtp.password=""
+
+
+Usage is as follows:
+
+Ses.sendEmail(Email(
+        subject = "Test mail",
+        from = EmailAddress("Erik Westra sender", "ewestra@rhinofly.nl"),
+        recipients = List(Recipient(Message.RecipientType.TO, EmailAddress("Erik Westra recipient", "ewestra@rhinofly.nl"))),
+        text = "text",
+        htmlText = "htmlText",
+        attachments = Seq.empty))
+
