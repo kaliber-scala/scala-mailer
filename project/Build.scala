@@ -9,7 +9,7 @@ object ApplicationBuild extends Build {
 
   val appDependencies = Seq(
     "javax.mail" % "mail" % "1.4",
-    "nl.rhinofly" %% "api-utils" % "1.0")
+    "nl.rhinofly" %% "api-utils" % "1.0-SNAPSHOT")
 
   val main = PlayProject(appName, appVersion, appDependencies, mainLang = SCALA).settings(
     organization := "nl.rhinofly")
