@@ -1,0 +1,13 @@
+logs
+project/project
+project/target
+conf/test.conf
+target
+tmp
+.history
+dist/.project
+/.classpath
+/.cache
+/.settings
+/.project
+test/conf/application.conf
