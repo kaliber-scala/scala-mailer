@@ -10,4 +10,4 @@ dist/.project
 /.cache
 /.settings
 /.project
-test/conf/application.conf
+test/conf
