@@ -16,6 +16,7 @@ class SesSpec extends Specification with Before {
       Ses.sendEmail(Email(
         subject = "Test mail",
         from = EmailAddress("Erik Westra sender", "ewestra@rhinofly.nl"),
+        replyTo = None,
         recipients = List(Recipient(Message.RecipientType.TO, EmailAddress("Erik Westra recipient", "ewestra@rhinofly.nl"))),
         text = "text",
         htmlText = "htmlText",

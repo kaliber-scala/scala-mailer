@@ -26,7 +26,8 @@ object Ses {
     properties.put("mail.smtps.host", keys.host)
     properties.put("mail.smtps.port", keys.port)
     properties.put("mail.smtp.ssl.enable", "true")
-
+    properties.put("mail.smtp.from", keys.failTo)
+    
     val username = keys.username
     val password = keys.password
 
@@ -55,10 +56,11 @@ object Ses {
     lazy val port = playConfiguration("mail.smtp.port")
     lazy val username = playConfiguration("mail.smtp.username")
     lazy val password = playConfiguration("mail.smtp.password")
+    lazy val failTo = playConfiguration("mail.smtp.failTo")
   }
 }
 
-case class Email(subject: String, from: EmailAddress, recipients: Seq[Recipient], text: String, htmlText: String, attachments: Seq[Attachment]) {
+case class Email(subject: String, from: EmailAddress, replyTo:Option[EmailAddress], recipients: Seq[Recipient], text: String, htmlText: String, attachments: Seq[Attachment]) {
 
   type Root = MimeMultipart
   type Related = MimeMultipart
@@ -88,6 +90,7 @@ case class Email(subject: String, from: EmailAddress, recipients: Seq[Recipient]
     val message = new MimeMessage(session)
     message setSubject subject
     message setFrom from
+    replyTo foreach(replyTo => message setReplyTo Array(replyTo))
     message setContent root
     message setSentDate new Date
 
