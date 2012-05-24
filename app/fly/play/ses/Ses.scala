@@ -1,6 +1,6 @@
 package fly.play.ses
 
-import fly.play.utils.PlayUtils._
+import fly.play.libraryUtils.PlayConfiguration
 import play.api.Play.current
 import javax.mail.internet.InternetAddress
 import javax.mail.internet.MimeBodyPart;
@@ -52,11 +52,11 @@ object Ses {
   }
 
   object keys {
-    lazy val host = playConfiguration("mail.smtp.host")
-    lazy val port = playConfiguration("mail.smtp.port")
-    lazy val username = playConfiguration("mail.smtp.username")
-    lazy val password = playConfiguration("mail.smtp.password")
-    lazy val failTo = playConfiguration("mail.smtp.failTo")
+    lazy val host = PlayConfiguration("mail.smtp.host")
+    lazy val port = PlayConfiguration("mail.smtp.port")
+    lazy val username = PlayConfiguration("mail.smtp.username")
+    lazy val password = PlayConfiguration("mail.smtp.password")
+    lazy val failTo = PlayConfiguration("mail.smtp.failTo")
   }
 }
 

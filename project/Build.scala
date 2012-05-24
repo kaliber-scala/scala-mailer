@@ -5,19 +5,21 @@ import PlayProject._
 object ApplicationBuild extends Build {
 
   val appName = "api-ses"
-  val appVersion = "1.0-SNAPSHOT"
+  val appVersion = "1.0"
 
   val appDependencies = Seq(
     "javax.mail" % "mail" % "1.4",
-    "nl.rhinofly" %% "api-utils" % "1.0-SNAPSHOT")
+    "nl.rhinofly" %% "library-utils" % "1.0")
 
- val rhinoflyRepo = "Rhinofly Internal Repository" at "http://maven-repository.rhinofly.net:8081/artifactory/libs-snapshot-local"
-    
+  def rhinoflyRepo(version: String) = {
+    val repo = if (version endsWith "SNAPSHOT") "snapshot" else "release"
+    Some("Rhinofly Internal " + repo.capitalize + " Repository" at "http://maven-repository.rhinofly.net:8081/artifactory/libs-" + repo + "-local")
+  }
+
   val main = PlayProject(appName, appVersion, appDependencies, mainLang = SCALA).settings(
     organization := "nl.rhinofly",
-    resolvers += rhinoflyRepo,
-    publishTo := Some(rhinoflyRepo),
-    credentials += Credentials(Path.userHome / ".ivy2" / ".credentials")  
-  )
+    resolvers += rhinoflyRepo("RELEASE").get,
+    publishTo <<= version(rhinoflyRepo),
+    credentials += Credentials(Path.userHome / ".ivy2" / ".credentials"))
 
 }
