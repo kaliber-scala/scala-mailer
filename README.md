@@ -1,15 +1,26 @@
 Amazon Simple Email Service (SES) module for Play 2.0
 =====================================================
 
-Allows you to send email using Amazon Ses SMTP
+Allows you to send email using Amazon SES SMTP
 
+
+Installation
+------------
+
+``` scala
+  val appDependencies = Seq(
+    "nl.rhinofly" %% "api-ses" % "1.0"
+  )
+  
+  val main = PlayProject(appName, appVersion, appDependencies, mainLang = SCALA).settings(
+    resolvers += "Rhinofly Internal Release Repository" at "http://maven-repository.rhinofly.net:8081/artifactory/libs-release-local"
+  )
+```
 
 Configuration
 -------------
 
-`application.conf` should contain a line: `include "mail.conf"`
-
-`mail.conf` should contain the following information:
+`application.conf` should contain the following information:
 
 ``` scala
 mail.from.name=From name
@@ -36,5 +47,3 @@ Usage
     attachments = Seq.empty))
 ```
 
-Installation
-------------
