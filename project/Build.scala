@@ -5,7 +5,7 @@ import play._
 object ApplicationBuild extends Build {
 
   val appName = "api-ses"
-  val appVersion = "1.0.2"
+  val appVersion = "1.1.0"
 
   val appDependencies = Seq(
     "javax.mail" % "mail" % "1.4",
