@@ -1,4 +1,4 @@
-package fly.play.ses
+package play.modules.flymailer
 
 import play.api.PlayException
 import play.api.Application

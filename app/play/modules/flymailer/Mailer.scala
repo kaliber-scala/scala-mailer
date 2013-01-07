@@ -1,4 +1,4 @@
-package fly.play.ses
+package play.modules.flymailer
 
 import play.api.Play.current
 import javax.mail.internet.InternetAddress
@@ -18,7 +18,7 @@ import javax.mail.PasswordAuthentication
 
 import scala.language.implicitConversions
 
-object Ses {
+object Mailer {
 
   def session: Session = {
     val properties = new Properties()
