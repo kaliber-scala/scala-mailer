@@ -3,8 +3,6 @@ package play.modules.mailer
 import org.specs2.mutable._
 import play.api.test.FakeApplication
 import javax.mail.Message
-import play.api.Configuration
-import play.api.Mode
 import org.jvnet.mock_javamail.Mailbox
 
 class MailerSpec extends Specification with Before {
