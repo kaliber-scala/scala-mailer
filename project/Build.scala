@@ -7,7 +7,9 @@ object ApplicationBuild extends Build {
   val appName = "mailer"
   val appVersion = "1.1.0-RC2"
 
-  val appDependencies = Seq("javax.mail" % "mail" % "1.4")
+  val compileDependencies = Seq("javax.mail" % "mail" % "1.4")
+  val testDependencies = Seq("org.jvnet.mock-javamail"%"mock-javamail"%"1.9" % "test")
+  val appDependencies = testDependencies ++ compileDependencies
 
   def rhinoflyRepo(version: String) = {
     val repo = if (version endsWith "SNAPSHOT") "snapshot" else "release"

@@ -22,11 +22,11 @@ object Mailer {
 
   def session: Session = {
     val properties = new Properties()
-    properties.put("mail.transport.protocol", "smtps")
+    properties.put("mail.transport.protocol", keys.protocol)
     properties.put("mail.smtps.quitwait", "false")
     properties.put("mail.smtps.host", keys.host)
     properties.put("mail.smtps.port", keys.port)
-    properties.put("mail.smtp.ssl.enable", "true")
+    properties.put("mail.smtp.ssl.enable", keys.sslEnable)
     properties.put("mail.smtp.from", keys.failTo)
     
     val username = keys.username
@@ -53,6 +53,8 @@ object Mailer {
   }
 
   object keys {
+    lazy val protocol = PlayConfiguration("mail.transport.protocol",Some("smtps"))
+    lazy val sslEnable = PlayConfiguration("mail.smtp.ssl.enable",Some("true"))
     lazy val host = PlayConfiguration("mail.smtp.host")
     lazy val port = PlayConfiguration("mail.smtp.port")
     lazy val username = PlayConfiguration("mail.smtp.username")

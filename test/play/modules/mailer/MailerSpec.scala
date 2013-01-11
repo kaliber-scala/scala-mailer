@@ -5,14 +5,24 @@ import play.api.test.FakeApplication
 import javax.mail.Message
 import play.api.Configuration
 import play.api.Mode
+import org.jvnet.mock_javamail.Mailbox
 
 class MailerSpec extends Specification with Before {
+  lazy val configuration = Map (
+      "mail.transport.protocol" -> "smtp"
+    , "mail.smtp.host" -> "localhost"
+    , "mail.smtp.port" -> "0"
+    , "mail.smtp.failTo" -> "toto@localhost"
+    , "mail.smtp.username" -> "foo"
+    , "mail.smtp.password" -> "bar"
+  )
 
-  def f = FakeApplication(new java.io.File("./test/"))
+  def f = FakeApplication(path=new java.io.File("./test/"),additionalConfiguration = configuration)
   
   def before = play.api.Play.start(f)
   "Ses" should {
     "send an email to ewestra@rhinofly.nl" in {
+      val inbox = Mailbox.get("ewestra@rhinofly.nl");
       Mailer.sendEmail(Email(
         subject = "Test mail",
         from = EmailAddress("Erik Westra sender", "ewestra@rhinofly.nl"),
@@ -21,8 +31,7 @@ class MailerSpec extends Specification with Before {
         text = "text",
         htmlText = "htmlText",
         attachments = Seq.empty))
-
-      success
+      inbox.size()===1
     }
   }
 }
