@@ -1,4 +1,4 @@
-package play.modules.flymailer
+package play.modules.mailer
 
 import org.specs2.mutable._
 import play.api.test.FakeApplication

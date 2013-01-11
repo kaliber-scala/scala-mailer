@@ -4,12 +4,10 @@ import play._
 
 object ApplicationBuild extends Build {
 
-  val appName = "api-ses"
+  val appName = "mailer"
   val appVersion = "1.1.0"
 
-  val appDependencies = Seq(
-    "javax.mail" % "mail" % "1.4",
-    "nl.rhinofly" %% "library-utils" % "1.0.2")
+  val appDependencies = Seq("javax.mail" % "mail" % "1.4")
 
   def rhinoflyRepo(version: String) = {
     val repo = if (version endsWith "SNAPSHOT") "snapshot" else "release"
@@ -17,7 +15,7 @@ object ApplicationBuild extends Build {
   }
 
   val main = play.Project(appName, appVersion, appDependencies).settings(
-    organization := "nl.rhinofly",
+    organization := "play.modules.mailer",
     resolvers += rhinoflyRepo("RELEASE").get,
     publishTo <<= version(rhinoflyRepo),
     credentials += Credentials(Path.userHome / ".ivy2" / ".credentials"))

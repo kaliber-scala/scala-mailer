@@ -1,4 +1,4 @@
-package play.modules.flymailer
+package play.modules.mailer
 
 import play.api.Play.current
 import javax.mail.internet.InternetAddress
