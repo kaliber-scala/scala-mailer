@@ -1,4 +1,7 @@
-Amazon Simple Email Service (SES) module for Play 2.0
+Note: this release is not yet stable.
+
+
+Amazon Simple Email Service (SES) module for Play 2.1
 =====================================================
 
 Allows you to send email using Amazon SES SMTP
