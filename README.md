@@ -1,11 +1,10 @@
 Note: this release is not yet stable.
 
 
-Amazon Simple Email Service (SES) module for Play 2.1
+Scala mailer module for Play 2.1
 =====================================================
 
-Allows you to send email using Amazon SES SMTP
-
+Scala wrapper around java mail which allows you to send emails. The default configuration options exposed in Configuration work using  Amazon SES SMTP
 
 Installation
 ------------
