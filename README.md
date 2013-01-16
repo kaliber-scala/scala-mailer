@@ -43,7 +43,9 @@ Usage
 -----
 
 ``` scala
-  Ses.sendEmail(Email(
+  import play.modules.mailer._
+
+  Mailer.sendEmail(Email(
     subject = "Test mail",
     from = EmailAddress("Erik Westra sender", "ewestra@rhinofly.nl"),
     replyTo = None,
