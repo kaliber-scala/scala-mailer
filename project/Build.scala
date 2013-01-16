@@ -5,7 +5,7 @@ import play._
 object ApplicationBuild extends Build {
 
   val appName = "mailer"
-  val appVersion = "1.1.0-RC2"
+  val appVersion = "1.0.2"
 
   val compileDependencies = Seq("javax.mail" % "mail" % "1.4")
   val testDependencies = Seq("org.jvnet.mock-javamail"%"mock-javamail"%"1.9" % "test")
@@ -16,7 +16,7 @@ object ApplicationBuild extends Build {
     Some("Rhinofly Internal " + repo.capitalize + " Repository" at "http://maven-repository.rhinofly.net:8081/artifactory/libs-" + repo + "-local")
   }
 
-  val main = play.Project(appName, appVersion, appDependencies).settings(
+  val main = PlayProject(appName, appVersion, appDependencies).settings(
     organization := "play.modules.mailer",
     resolvers += rhinoflyRepo("RELEASE").get,
     publishTo <<= version(rhinoflyRepo),

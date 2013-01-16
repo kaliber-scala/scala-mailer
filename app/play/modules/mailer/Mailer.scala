@@ -16,8 +16,6 @@ import java.util.Properties
 import javax.mail.Authenticator
 import javax.mail.PasswordAuthentication
 
-import scala.language.implicitConversions
-
 object Mailer {
 
   def session: Session = {

@@ -1,7 +1,7 @@
 Note: this release is not yet stable.
 
 
-Scala mailer module for Play 2.1
+Scala mailer module for Play 2.0.x
 =====================================================
 
 Scala wrapper around java mail which allows you to send emails. The default configuration options exposed in Configuration work using  Amazon SES SMTP
@@ -11,7 +11,7 @@ Installation
 
 ``` scala
   val appDependencies = Seq(
-    "play.modules.mailer" %% "mailer" % "1.1-RC2"
+    "play.modules.mailer" %% "mailer" % "1.0.2"
   )
   
   val main = PlayProject(appName, appVersion, appDependencies, mainLang = SCALA).settings(
