@@ -11,7 +11,7 @@ Installation
 
 ``` scala
   val appDependencies = Seq(
-    "play.modules.mailer" %% "mailer" % "1.1-RC2"
+    "play.modules.mailer" %% "mailer" % "1.1.0-RC2"
   )
   
   val main = PlayProject(appName, appVersion, appDependencies, mainLang = SCALA).settings(
