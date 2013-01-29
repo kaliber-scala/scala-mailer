@@ -17,7 +17,7 @@ object ApplicationBuild extends Build {
   }
 
   val main = play.Project(appName, appVersion, appDependencies).settings(
-    organization := "play.modules.mailer",
+    organization := "nl.rhinofly",
     resolvers += rhinoflyRepo("RELEASE").get,
     publishTo <<= version(rhinoflyRepo),
     credentials += Credentials(Path.userHome / ".ivy2" / ".credentials"))
