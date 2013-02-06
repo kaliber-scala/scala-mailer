@@ -4,11 +4,11 @@ import play._
 
 object ApplicationBuild extends Build {
 
-  val appName = "mailer"
-  val appVersion = "1.1.0-RC3-SNAPSHOT"
+  val appName = "play-mailer"
+  val appVersion = "1.1.0"
 
   val compileDependencies = Seq("javax.mail" % "mail" % "1.4")
-  val testDependencies = Seq("org.jvnet.mock-javamail"%"mock-javamail"%"1.9" % "test")
+  val testDependencies = Seq("org.jvnet.mock-javamail" % "mock-javamail" % "1.9" % "test")
   val appDependencies = testDependencies ++ compileDependencies
 
   def rhinoflyRepo(version: String) = {
@@ -17,7 +17,7 @@ object ApplicationBuild extends Build {
   }
 
   val main = play.Project(appName, appVersion, appDependencies).settings(
-    organization := "nl.rhinofly",
+    organization := "play.modules.mailer",
     resolvers += rhinoflyRepo("RELEASE").get,
     publishTo <<= version(rhinoflyRepo),
     credentials += Credentials(Path.userHome / ".ivy2" / ".credentials"))
