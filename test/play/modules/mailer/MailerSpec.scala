@@ -2,14 +2,13 @@ package play.modules.mailer
 
 import org.jvnet.mock_javamail.Mailbox
 import org.specs2.matcher.MatchResult
-import org.specs2.mutable.Before
-import org.specs2.mutable.Specification
+import org.specs2.mutable.{BeforeAfter, Before, Specification}
 
-import javax.mail.Message
 import javax.mail.internet.InternetAddress
 import play.api.test.FakeApplication
+import javax.mail.Message
 
-class MailerSpec extends Specification with Before {
+class MailerSpec extends Specification with BeforeAfter {
   lazy val configuration = Map(
     "mail.transport.protocol" -> "smtp",
     "mail.smtp.host" -> "localhost",
@@ -20,7 +19,8 @@ class MailerSpec extends Specification with Before {
 
   def f = FakeApplication(path = new java.io.File("./test/"), additionalConfiguration = configuration)
 
-  def before = play.api.Play.start(f)
+  def before { play.api.Play.start(f) }
+  def after { Mailbox.clearAll() }
 
   val inbox = {
     val inbox = Mailbox.get("ewestra@rhinofly.nl");
