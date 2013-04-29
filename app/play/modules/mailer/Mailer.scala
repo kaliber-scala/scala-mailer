@@ -1,4 +1,5 @@
-package play.modules.mailer
+package play.modules
+package mailer
 
 import java.util.Date
 import java.util.Properties
@@ -18,8 +19,9 @@ import javax.mail.util.ByteArrayDataSource
 import play.api.Play.current
 
 import scala.language.implicitConversions
+import scala.concurrent.{Future, ExecutionContext}
 
-object Mailer {
+trait Mailer {
 
   def session: Session = {
     val properties = new Properties()
@@ -43,14 +45,14 @@ object Mailer {
     })
   }
 
-  def sendEmail(email: Email) = {
+  def sendEmail(email: Email) {
 
     val message = email createFor session
 
     val transport = session.getTransport
-    transport.connect
+    transport.connect()
     transport.sendMessage(message, message.getAllRecipients)
-    transport.close
+    transport.close()
   }
 
   object keys {
@@ -64,13 +66,23 @@ object Mailer {
   }
 }
 
+trait AsyncMailer extends Mailer {
+  def sendEmail(email: Email)(implicit executionContext:ExecutionContext):Future[Email] = {
+    import scala.concurrent.future
+    future{Mailer.sendEmail(email);email}
+  }
+}
+
+object Mailer extends Mailer
+object AsyncMailer extends AsyncMailer
+
 case class Email(subject: String, from: EmailAddress, replyTo: Option[EmailAddress], recipients: Seq[Recipient], text: String, htmlText: String, attachments: Seq[Attachment]) {
 
   type Root = MimeMultipart
   type Related = MimeMultipart
   type Alternative = MimeMultipart
 
-  def messageStructure: (Root, Related, Alternative) = {
+  private[mailer] def messageStructure: (Root, Related, Alternative) = {
     val root = new MimeMultipart("mixed")
     val relatedPart = new MimeBodyPart
     val related = new MimeMultipart("related")
@@ -86,7 +98,7 @@ case class Email(subject: String, from: EmailAddress, replyTo: Option[EmailAddre
     (root, related, alternative)
   }
 
-  def createFor(session: Session): Message = {
+  private[mailer] def createFor(session: Session): Message = {
 
     val (root, related, alternative) = messageStructure
 
@@ -116,7 +128,7 @@ case class Email(subject: String, from: EmailAddress, replyTo: Option[EmailAddre
       }
     }
 
-    message.saveChanges
+    message.saveChanges()
 
     message
   }
@@ -140,6 +152,7 @@ case class Email(subject: String, from: EmailAddress, replyTo: Option[EmailAddre
   }
 
 }
+
 case class EmailAddress(name: String, address: String)
 case class Recipient(tpe: Message.RecipientType, emailAddress: EmailAddress)
 case class Attachment(name: String, datasource: DataSource, disposition: Disposition)
