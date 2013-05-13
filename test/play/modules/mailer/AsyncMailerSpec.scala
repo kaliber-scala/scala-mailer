@@ -31,7 +31,7 @@ class AsyncMailerSpec extends Specification with BeforeAfter {
       subject = "Test mail",
       from = EmailAddress("Erik Westrb sender", "ewestrb@rhinofly.nl"),
       replyTo = None,
-      recipients = List(Recipient(Message.RecipientType.TO, EmailAddress("Erik Westrb recipient", "ewestrb@rhinofly.nl"))),
+      recipients = List(Recipient(RecipientType.TO, EmailAddress("Erik Westrb recipient", "ewestrb@rhinofly.nl"))),
       text = "text",
       htmlText = "htmlText",
       attachments = Seq.empty)).map(_=>inbox),Duration(1,"s"))
