@@ -5,7 +5,6 @@ import java.util.Date
 import java.util.Properties
 
 import javax.activation.DataHandler
-import javax.activation.DataSource
 import javax.mail.Authenticator
 import javax.mail.Message
 import javax.mail.Part
@@ -154,7 +153,7 @@ case class Email(subject: String, from: EmailAddress, replyTo: Option[EmailAddre
 }
 
 case class EmailAddress(name: String, address: String)
-case class Recipient(tpe: Message.RecipientType, emailAddress: EmailAddress)
+case class Recipient(tpe: RecipientType, emailAddress: EmailAddress)
 case class Attachment(name: String, datasource: DataSource, disposition: Disposition)
 
 abstract sealed class Disposition(val value: String)
