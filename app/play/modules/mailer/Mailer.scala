@@ -5,11 +5,7 @@ import java.util.Date
 import java.util.Properties
 
 import javax.activation.DataHandler
-import javax.mail.Authenticator
-import javax.mail.Message
-import javax.mail.Part
-import javax.mail.PasswordAuthentication
-import javax.mail.Session
+import javax.mail._
 import javax.mail.internet.InternetAddress
 import javax.mail.internet.MimeBodyPart
 import javax.mail.internet.MimeMessage
@@ -19,6 +15,10 @@ import play.api.Play.current
 
 import scala.language.implicitConversions
 import scala.concurrent.{Future, ExecutionContext}
+import scala.util.Try
+import play.api.Logger
+import scala.Some
+import scala.util.Success
 
 trait Mailer {
 
@@ -44,14 +44,35 @@ trait Mailer {
     })
   }
 
-  def sendEmail(email: Email) {
+  private def send(transport:Try[Transport])(email:Email):Try[Email]={
+    def doSend(transport:Transport, email:Email)={
+      val message = email createFor session
+      transport.sendMessage(message, message.getAllRecipients)
+      email
+    }
+    transport.map(doSend(_,email))
+  }
 
-    val message = email createFor session
-
+  def sendEmail(email: Email){
     val transport = session.getTransport
     transport.connect()
-    transport.sendMessage(message, message.getAllRecipients)
+    send(Success(transport))(email)
     transport.close()
+  }
+
+  def sendEmails(emails:Seq[Email]):Seq[Try[Email]]={
+    val transport = session.getTransport
+    try{
+      for {
+        connection <- Seq(Try({transport.connect();transport}))
+        email <- emails
+      } yield send(connection)(email)
+    } finally try {
+      transport.close()
+    } catch {
+      case t:Throwable => Logger.error(s"Error when closing connexion with mail server: ${t.getMessage}")
+    }
+
   }
 
   object keys {
@@ -117,7 +138,7 @@ case class Email(subject: String, from: EmailAddress, replyTo: Option[EmailAddre
     alternative addBodyPart messagePart
 
     val messagePartHtml = new MimeBodyPart
-    messagePartHtml.setContent(htmlText, "text/html; charset=\"UTF-8\"");
+    messagePartHtml.setContent(htmlText, "text/html; charset=\"UTF-8\"")
     alternative addBodyPart messagePartHtml
 
     attachments foreach { a =>
@@ -145,7 +166,7 @@ case class Email(subject: String, from: EmailAddress, replyTo: Option[EmailAddre
     attachmentPart.setFileName(name)
     attachmentPart.setHeader("Content-Type", datasource.getContentType + "; filename=" + datasourceName + "; name=" + datasourceName)
     attachmentPart.setHeader("Content-ID", "<" + datasourceName + ">")
-    attachmentPart.setDisposition(disposition.value + "; size=0");
+    attachmentPart.setDisposition(disposition.value + "; size=0")
 
     attachmentPart
   }
