@@ -124,7 +124,7 @@ case class Email(subject: String, from: EmailAddress, replyTo: Option[EmailAddre
     val (root, related, alternative) = messageStructure
 
     val message = new MimeMessage(session)
-    message setSubject subject
+    message.setSubject(subject, "UTF-8")
     message setFrom from
     replyTo foreach (replyTo => message setReplyTo Array(replyTo))
     message setContent root
