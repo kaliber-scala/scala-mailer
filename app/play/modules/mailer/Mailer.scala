@@ -14,7 +14,7 @@ import javax.mail.util.ByteArrayDataSource
 import play.api.Play.current
 
 import scala.language.implicitConversions
-import scala.concurrent.{Future, ExecutionContext}
+import scala.concurrent.{ Future, ExecutionContext }
 import scala.util.Try
 import play.api.Logger
 import scala.Some
@@ -44,33 +44,33 @@ trait Mailer {
     })
   }
 
-  private def send(transport:Try[Transport])(email:Email):Try[Email]={
-    def doSend(transport:Transport, email:Email)={
+  private def send(transport: Try[Transport])(email: Email): Try[Email] = {
+    def doSend(transport: Transport, email: Email) = {
       val message = email createFor session
       transport.sendMessage(message, message.getAllRecipients)
       email
     }
-    transport.map(doSend(_,email))
+    transport.map(doSend(_, email))
   }
 
-  def sendEmail(email: Email){
+  def sendEmail(email: Email):Unit = {
     val transport = session.getTransport
     transport.connect()
     send(Success(transport))(email)
     transport.close()
   }
 
-  def sendEmails(emails:Seq[Email]):Seq[Try[Email]]={
+  def sendEmails(emails: Seq[Email]): Seq[Try[Email]] = {
     val transport = session.getTransport
-    try{
+    try {
       for {
-        connection <- Seq(Try({transport.connect();transport}))
+        connection <- Seq(Try({ transport.connect(); transport }))
         email <- emails
       } yield send(connection)(email)
     } finally try {
       transport.close()
     } catch {
-      case t:Throwable => Logger.error(s"Error when closing connexion with mail server: ${t.getMessage}")
+      case t: Throwable => Logger.error(s"Error when closing connection with mail server: ${t.getMessage}")
     }
 
   }
@@ -86,10 +86,11 @@ trait Mailer {
   }
 }
 
-trait AsyncMailer extends Mailer {
-  def sendEmail(email: Email)(implicit executionContext:ExecutionContext):Future[Email] = {
+trait AsyncMailer extends Mailer { 
+  
+  def sendEmail(email: Email)(implicit executionContext: ExecutionContext): Future[Email] = {
     import scala.concurrent.future
-    future{Mailer.sendEmail(email);email}
+    future { super.sendEmail(email); email }
   }
 }
 
