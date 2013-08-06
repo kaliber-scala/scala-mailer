@@ -14,14 +14,14 @@ class MailerSpec extends Specification with BeforeAfter with TestConfiguration {
   def sendDefaultMail() =
     Mailer sendEmail testEmail()
 
-  def withMessage(matchResult: Message => MatchResult[_]): MatchResult[Any] = 
+  def withMessage(matchResult: Message => MatchResult[_]): MatchResult[Any] =
     (defaultInbox.size === 1).setMessage("No message available to test") and
       matchResult(defaultInbox get 0)
 
   "Mailer" should {
 
     sendDefaultMail()
-    
+
     "send an email" in {
       defaultInbox.size === 1
     }
@@ -59,14 +59,12 @@ class MailerSpec extends Specification with BeforeAfter with TestConfiguration {
 
       val emails = Mailer.sendEmails(email :: email :: Nil)
 
-      val result =
-        emails.map {
-          case Success(e) => e.subject
-          case _ => "fail"
-        }
-
       val subjects = "Test mail for batch" :: "Test mail for batch" :: Nil
-      result === subjects
+
+      emails must beLike {
+        case Success(Success(_) :: Success(_) :: Nil) => ok 
+      }
+
       inbox.size() === 2
       inbox.asScala.map(_.getSubject) === subjects
     }
@@ -88,14 +86,10 @@ class MailerSpec extends Specification with BeforeAfter with TestConfiguration {
 
       val emails = Mailer.sendEmails(email :: errorEmail :: Nil)
 
-      val result =
-        emails.map {
-          case Success(e) => e.subject
-          case Failure(e) => "failed"
-          case _ => "unexpected error"
-        }
+      emails must beLike {
+        case Success(Success(_) :: Failure(_) :: Nil) => ok 
+      }
 
-      result === "Test mail for batch error" :: "failed" :: Nil
       inbox.size() === 1
       errorInbox.size() === 0
     }
