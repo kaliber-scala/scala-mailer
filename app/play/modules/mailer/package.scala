@@ -1,11 +1,13 @@
 package play.modules
 
-import javax.mail.Authenticator
 import java.util.Properties
+import javax.mail.Authenticator
 import javax.mail.PasswordAuthentication
+import play.modules.mailer.PlayConfiguration
+import play.api.Play.current
 
 package object mailer {
-  
+
   type DataSource = javax.activation.DataSource
 
   type RecipientType = javax.mail.Message.RecipientType
@@ -14,15 +16,23 @@ package object mailer {
     val BCC: RecipientType = javax.mail.Message.RecipientType.BCC
     val CC: RecipientType = javax.mail.Message.RecipientType.CC
   }
-  
+
   type Session = javax.mail.Session
-  
+
   object Session {
-    
-    implicit def fromConfiguration:Session = {
-    
-      import Mailer.keys
-      
+
+    object keys {
+      lazy val protocol = PlayConfiguration("mail.transport.protocol", default = "smtps")
+      lazy val sslEnable = PlayConfiguration("mail.smtp.ssl.enable", default = "true")
+      lazy val host = PlayConfiguration("mail.smtp.host")
+      lazy val port = PlayConfiguration("mail.smtp.port")
+      lazy val username = PlayConfiguration("mail.smtp.username")
+      lazy val password = PlayConfiguration("mail.smtp.password")
+      lazy val failTo = PlayConfiguration("mail.smtp.failTo")
+    }
+
+    lazy val fromConfiguration: Session = {
+
       val properties = new Properties()
       properties.put("mail.transport.protocol", keys.protocol)
       properties.put("mail.smtps.quitwait", "false")

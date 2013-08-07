@@ -11,49 +11,40 @@ import java.util.Date
 import javax.activation.DataHandler
 import scala.language.implicitConversions
 
-case class Email(subject: String, from: EmailAddress, replyTo: Option[EmailAddress], recipients: Seq[Recipient], text: String, htmlText: String, attachments: Seq[Attachment]) {
+case class Email(subject: String, from: EmailAddress, text: String, htmlText: String, replyTo: Option[EmailAddress] = None, recipients: Seq[Recipient] = Seq.empty, attachments: Seq[Attachment] = Seq.empty) {
 
-  type Root = MimeMultipart
-  type Related = MimeMultipart
-  type Alternative = MimeMultipart
+  def to(name: String, address: String) =
+    copy(recipients = recipients :+
+      Recipient(RecipientType.TO, EmailAddress(name, address)))
+
+  def cc(name: String, address: String) =
+    copy(recipients = recipients :+
+      Recipient(RecipientType.CC, EmailAddress(name, address)))
+
+  def bcc(name: String, address: String) =
+    copy(recipients = recipients :+
+      Recipient(RecipientType.CC, EmailAddress(name, address)))
 
   def createFor(session: Session): Message = {
 
     val (root, related, alternative) = messageStructure
 
-    val message = new MimeMessage(session)
-    message setSubject (subject, "UTF-8")
-    message setFrom from
-    replyTo foreach (replyTo => message setReplyTo Array(replyTo))
-    message setContent root
-    message setSentDate new Date
-
-    recipients foreach {
-      case Recipient(tpe, emailAddress) =>
-        message.addRecipient(tpe, emailAddress)
-    }
-
-    val messagePart = new MimeBodyPart
-    messagePart setText (text, "UTF-8")
-    alternative addBodyPart messagePart
-
-    val messagePartHtml = new MimeBodyPart
-    messagePartHtml setContent (htmlText, "text/html; charset=\"UTF-8\"")
-    alternative addBodyPart messagePartHtml
-
-    attachments foreach { 
-      case a @ Attachment(_, _, Disposition.Inline) =>
-        related addBodyPart a
-      case a @ Attachment(_, _, Disposition.Attachment) =>
-        root addBodyPart a
-    }
+    val message = createMimeMessage(session, root)
+    addRecipients(message)
+    addTextPart(alternative)
+    addHtmlPart(alternative)
+    addAttachments(root, related)
 
     message.saveChanges()
 
     message
   }
 
-  private[mailer] def messageStructure: (Root, Related, Alternative) = {
+  private type Root = MimeMultipart
+  private type Related = MimeMultipart
+  private type Alternative = MimeMultipart
+
+  private def messageStructure: (Root, Related, Alternative) = {
     val root = new MimeMultipart("mixed")
     val relatedPart = new MimeBodyPart
     val related = new MimeMultipart("related")
@@ -69,7 +60,44 @@ case class Email(subject: String, from: EmailAddress, replyTo: Option[EmailAddre
 
     (root, related, alternative)
   }
-  
+
+  private def createMimeMessage(session: play.modules.mailer.Session, root: Email.this.Root): javax.mail.internet.MimeMessage = {
+
+    val message = new MimeMessage(session)
+    message setSubject (subject, "UTF-8")
+    message setFrom from
+    replyTo foreach (replyTo => message setReplyTo Array(replyTo))
+    message setContent root
+    message setSentDate new Date
+    message
+  }
+
+  private def addRecipients(message: javax.mail.internet.MimeMessage): Unit =
+    recipients foreach {
+      case Recipient(tpe, emailAddress) =>
+        message addRecipient (tpe, emailAddress)
+    }
+
+  private def addTextPart(alternative: Alternative): Unit = {
+    val messagePart = new MimeBodyPart
+    messagePart setText (text, "UTF-8")
+    alternative addBodyPart messagePart
+  }
+
+  private def addHtmlPart(alternative: Alternative): Unit = {
+    val messagePartHtml = new MimeBodyPart
+    messagePartHtml setContent (htmlText, "text/html; charset=UTF-8")
+    alternative addBodyPart messagePartHtml
+  }
+
+  private def addAttachments(root: Root, related: Related): Unit =
+    attachments foreach {
+      case a @ Attachment(_, _, Disposition.Inline) =>
+        related addBodyPart a
+      case a @ Attachment(_, _, Disposition.Attachment) =>
+        root addBodyPart a
+    }
+
   private implicit def emailAddressToInternetAddress(emailAddress: EmailAddress): InternetAddress =
     new InternetAddress(emailAddress.address, emailAddress.name)
 
@@ -82,12 +110,11 @@ case class Email(subject: String, from: EmailAddress, replyTo: Option[EmailAddre
     attachmentPart.setDataHandler(new DataHandler(datasource))
     attachmentPart.setFileName(name)
     attachmentPart.setHeader("Content-Type", datasource.getContentType + "; filename=" + datasourceName + "; name=" + datasourceName)
-    attachmentPart.setHeader("Content-ID", "<" + datasourceName + ">")
+    attachmentPart.setContentID("<" + datasourceName + ">")
     attachmentPart.setDisposition(disposition.value + "; size=0")
 
     attachmentPart
   }
-
 }
 
 case class EmailAddress(name: String, address: String)
@@ -101,14 +128,14 @@ object Disposition {
 
 case class Attachment(name: String, datasource: DataSource, disposition: Disposition)
 
-object Attachment extends Function3[String, DataSource, Disposition, Attachment] {
-  def apply(name: String, data: Array[Byte], mimeType: String): Attachment = {
-    val dataSource = new ByteArrayDataSource(data, mimeType)
-    dataSource setName name
-    apply(name, dataSource, Disposition.Attachment)
-  }
+object Attachment extends ((String, DataSource, Disposition) => Attachment) {
+
+  def apply(name: String, data: Array[Byte], mimeType: String): Attachment =
+    apply(name, data, mimeType, Disposition.Attachment)
 
   def apply(name: String, data: Array[Byte], mimeType: String, disposition: Disposition): Attachment = {
+    require(mimeType matches ".+/.+", "Invalid MIME type, should contain a /")
+
     val dataSource = new ByteArrayDataSource(data, mimeType)
     dataSource setName name
     apply(name, dataSource, disposition)
