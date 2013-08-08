@@ -25,9 +25,17 @@ object MailerTests extends Specification with TestApplication with FullEmail wit
       Mailer.session === Session.fromConfiguration
     }
 
+    import fullEmailProperties._
+    
+    val providerFailure = "fails correctly if no provider can be found"
+    val connectionFailure = "fails correctly if the connection fails"
+    val messageFailure = "fails correctly if sending the message fails"
+    val closeFailure = "fails correctly if closing the transport fails"
+    def simulatedErrorMessage(name:String, address:String) = s"Simulated error sending message to $name <$address>"
+
     "have a method sendEmail that" >> {
 
-      "fails correctly if no provider can be found" in {
+      providerFailure in {
 
         val session = javax.mail.Session.getInstance(new Properties())
         val result = sendMail(session)
@@ -39,7 +47,7 @@ object MailerTests extends Specification with TestApplication with FullEmail wit
         }
       }
 
-      "fails correctly if the connection fails" in {
+      connectionFailure in {
 
         val result = sendMail(session(classOf[FaultyConnectionTransport]))
         result must beLike {
@@ -50,7 +58,7 @@ object MailerTests extends Specification with TestApplication with FullEmail wit
 
       }
 
-      "fails correctly if sending the message fails" in {
+      messageFailure in {
 
         val result = sendMail(session(classOf[FaultyMessageTransport]))
         result must beLike {
@@ -60,7 +68,7 @@ object MailerTests extends Specification with TestApplication with FullEmail wit
         }
       }
 
-      "fails correctly if closing the transport fails" in {
+      closeFailure in {
 
         val result = sendMail(session(classOf[FaultyCloseTransport]))
         result must beLike {
@@ -68,39 +76,123 @@ object MailerTests extends Specification with TestApplication with FullEmail wit
             messagingExceptionWithMessage(t, "closeFailed")
         }
       }
-      
+
       "fails if the mailbox responds in failure" in {
-        
+
         withFaultyMailbox { mailbox =>
-          
+
           val result = sendMail()
-          
+
           result must beLike {
             case Failure(SendEmailException(email, t)) =>
               email === simpleEmail
-              messagingExceptionWithMessage(t, s"Simulated error sending message to $toName <$toAddress>")
+              messagingExceptionWithMessage(t, simulatedErrorMessage(toName, toAddress))
           }
         }
       }
-      
+
       "correctly sends a full email" in {
+
         withDefaultMailbox { mailbox =>
-          
+
           val result = sendMail(email = fullEmail)
-          
+
           result === Success()
           mailbox.size === 1
           fullMessageTest(mailbox.get(0))
         }
       }
     }
+
+    "have a method sendEmails that" >> {
+
+      providerFailure in {
+
+        val session = javax.mail.Session.getInstance(new Properties())
+        val result = sendMails(session)
+
+        result must beLike {
+          case Failure(SendEmailsException(emails, t)) =>
+            emails === simpleEmails
+            t must beAnInstanceOf[NoSuchProviderException]
+        }
+      }
+
+      connectionFailure in {
+
+        val result = sendMails(session(classOf[FaultyConnectionTransport]))
+        result must beLike {
+          case Failure(SendEmailsException(emails, t)) =>
+            emails === simpleEmails
+            messagingExceptionWithMessage(t, "connectionFailed")
+        }
+
+      }
+
+      messageFailure in {
+
+        val result = sendMails(session(classOf[FaultyMessageTransport]))
+        result must beLike {
+          case Success(Seq(
+            Failure(SendEmailException(email1, t1)),
+            Failure(SendEmailException(email2, t2)))) =>
+            email1 === simpleEmail
+            email2 === simpleFailEmail
+            messagingExceptionWithMessage(t1, "sendMessageFailed")
+            messagingExceptionWithMessage(t2, "sendMessageFailed")
+        }
+      }
+
+      closeFailure in {
+
+        val result = sendMails(session(classOf[FaultyCloseTransport]))
+        result must beLike {
+          case Failure(TransportCloseException(t)) =>
+            messagingExceptionWithMessage(t, "closeFailed")
+        }
+      }
+
+      "partially fails if the mailbox responds in failure for one of the emails" in {
+
+        withMailboxes(toAddress, failAddress) { mailboxes =>
+
+          mailboxes.last.setError(true)
+          
+          val result = sendMails()
+
+          result must beLike {
+            case Success(Seq(Success(_), Failure(SendEmailException(email, t)))) =>
+              email === simpleFailEmail
+              messagingExceptionWithMessage(t, simulatedErrorMessage(failName, failAddress))
+          }
+          
+          mailboxes.head.size === 1
+        }
+      }
+
+      "correctly sends 2 emails" in {
+
+        withDefaultMailbox { mailbox =>
+
+          val result = sendMails(emails = Seq(simpleEmail, simpleEmail))
+
+          result === Success(Seq(Success(), Success()))
+          mailbox.size === 2
+        }
+      }
+    }
   }
 
-  def sendMail(session: Session = Session.fromConfiguration, email:Email = simpleEmail) = {
+  def sendMail(session: Session = Session.fromConfiguration, email: Email = simpleEmail) = {
     val mailer = new Mailer(session)
     mailer.sendEmail(email)
   }
-  
+
+  def sendMails(session: Session = Session.fromConfiguration, emails: Seq[Email] = simpleEmails) = {
+    val mailer = new Mailer(session)
+    mailer.sendEmails(emails)
+  }
+
   def messagingExceptionWithMessage(t: Throwable, message: String) = {
     t must beAnInstanceOf[MessagingException]
     t.getMessage === message
@@ -148,23 +240,39 @@ object MailerTests extends Specification with TestApplication with FullEmail wit
       throw new MessagingException("closeFailed")
   }
 
-  val toName = "to"
-  val toAddress = "to@domain"
-  
-  val simpleEmail =
-    Email(
-      subject = "subject",
-      from = EmailAddress("from", "from@domain"),
-      text = "text",
-      htmlText = "htmlText")
-      .to(toName, toAddress)
+  val simpleEmail = {
+    import fullEmailProperties._
 
-  def withDefaultMailbox[T](code: Mailbox => T) = {
-    val defaultMailbox = Mailbox.get(toAddress)
-    code(defaultMailbox)
-    defaultMailbox.setError(false)
-    defaultMailbox.clear()
+    Email(
+      subject,
+      EmailAddress(fromName, fromAddress),
+      textContent,
+      htmlTextContent)
+      .to(toName, toAddress)
   }
+
+  val failName = "fail"
+  val failAddress = "fail@domain"
+
+  val simpleFailEmail =
+    simpleEmail
+      .copy(recipients = Seq.empty)
+      .to(failName, failAddress)
+
+  val simpleEmails =
+    Seq(simpleEmail, simpleFailEmail)
+
+  def withMailboxes[T](addresses: String*)(code: Seq[Mailbox] => T) = {
+    val mailboxes = addresses.map(Mailbox.get)
+    code(mailboxes)
+    mailboxes.foreach(_.setError(false))
+    mailboxes.foreach(_.clear())
+  }
+
+  def withDefaultMailbox[T](code: Mailbox => T) =
+    withMailboxes(fullEmailProperties.toAddress) { mailboxes =>
+      code(mailboxes.head)
+    }
 
   def withFaultyMailbox[T](code: Mailbox => T) =
     withDefaultMailbox { mailbox =>
