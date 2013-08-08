@@ -6,7 +6,7 @@ import scala.util.Failure
 import scala.util.Success
 import scala.util.Try
 
-class AsyncMailer(mailer: Mailer) {
+class AsyncMailer(val mailer: Mailer) {
 
   def sendEmail(email: Email)(implicit executionContext: ExecutionContext): Future[Unit] = {
     Future(mailer.sendEmail(email)).flatMap {

@@ -17,6 +17,14 @@ class Mailer(val session: Session) {
       case cause => Failure(SendEmailException(email, cause))
     }
 
+  def sendEmails(emails: Seq[Email]): Try[Seq[Try[Unit]]] =
+    tryWithTransport { implicit transport =>
+      emails.map(send)
+    }.recoverWith {
+      case cause: TransportCloseException => Failure(cause)
+      case cause => Failure(SendEmailsException(emails, cause))
+    }
+
   private def tryWithTransport[T](code: Transport => T): Try[T] =
     Try {
       val transport = session.getTransport
@@ -27,7 +35,7 @@ class Mailer(val session: Session) {
         try {
           transport.close()
         } catch {
-          case t:Throwable => throw TransportCloseException(t)
+          case t: Throwable => throw TransportCloseException(t)
         }
     }
 
@@ -38,15 +46,6 @@ class Mailer(val session: Session) {
     }.recoverWith {
       case cause => Failure(SendEmailException(email, cause))
     }
-
-  def sendEmails(emails: Seq[Email]): Try[Seq[Try[Unit]]] =
-    tryWithTransport { implicit transport =>
-      emails.map(send)
-    }.recoverWith {
-      case cause: TransportCloseException => Failure(cause)
-      case cause => Failure(SendEmailsException(emails, cause))
-    }
-
 }
 
 case class SendEmailException(email: Email, cause: Throwable) extends RuntimeException(cause)

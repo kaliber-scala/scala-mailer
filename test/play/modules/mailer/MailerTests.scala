@@ -16,7 +16,8 @@ import javax.mail.Authenticator
 import org.jvnet.mock_javamail.Mailbox
 import scala.util.Success
 
-object MailerTests extends Specification with TestApplication with FullEmail with FullMessageTest {
+object MailerTests extends Specification with TestApplication
+  with FullEmail with FullMessageTest with MailboxUtilities {
 
   "Mailer" should {
 
@@ -26,12 +27,12 @@ object MailerTests extends Specification with TestApplication with FullEmail wit
     }
 
     import fullEmailProperties._
-    
+
     val providerFailure = "fails correctly if no provider can be found"
     val connectionFailure = "fails correctly if the connection fails"
     val messageFailure = "fails correctly if sending the message fails"
     val closeFailure = "fails correctly if closing the transport fails"
-    def simulatedErrorMessage(name:String, address:String) = s"Simulated error sending message to $name <$address>"
+    def simulatedErrorMessage(name: String, address: String) = s"Simulated error sending message to $name <$address>"
 
     "have a method sendEmail that" >> {
 
@@ -157,7 +158,7 @@ object MailerTests extends Specification with TestApplication with FullEmail wit
         withMailboxes(toAddress, failAddress) { mailboxes =>
 
           mailboxes.last.setError(true)
-          
+
           val result = sendMails()
 
           result must beLike {
@@ -165,7 +166,7 @@ object MailerTests extends Specification with TestApplication with FullEmail wit
               email === simpleFailEmail
               messagingExceptionWithMessage(t, simulatedErrorMessage(failName, failAddress))
           }
-          
+
           mailboxes.head.size === 1
         }
       }
@@ -239,45 +240,5 @@ object MailerTests extends Specification with TestApplication with FullEmail wit
     override def close() =
       throw new MessagingException("closeFailed")
   }
-
-  val simpleEmail = {
-    import fullEmailProperties._
-
-    Email(
-      subject,
-      EmailAddress(fromName, fromAddress),
-      textContent,
-      htmlTextContent)
-      .to(toName, toAddress)
-  }
-
-  val failName = "fail"
-  val failAddress = "fail@domain"
-
-  val simpleFailEmail =
-    simpleEmail
-      .copy(recipients = Seq.empty)
-      .to(failName, failAddress)
-
-  val simpleEmails =
-    Seq(simpleEmail, simpleFailEmail)
-
-  def withMailboxes[T](addresses: String*)(code: Seq[Mailbox] => T) = {
-    val mailboxes = addresses.map(Mailbox.get)
-    code(mailboxes)
-    mailboxes.foreach(_.setError(false))
-    mailboxes.foreach(_.clear())
-  }
-
-  def withDefaultMailbox[T](code: Mailbox => T) =
-    withMailboxes(fullEmailProperties.toAddress) { mailboxes =>
-      code(mailboxes.head)
-    }
-
-  def withFaultyMailbox[T](code: Mailbox => T) =
-    withDefaultMailbox { mailbox =>
-      mailbox.setError(true)
-      code(mailbox)
-    }
 
 }
