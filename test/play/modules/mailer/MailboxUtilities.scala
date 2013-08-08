@@ -26,19 +26,20 @@ trait MailboxUtilities { self: FullEmail =>
   val simpleEmails =
     Seq(simpleEmail, simpleFailEmail)
 
-  def withMailboxes[T](addresses: String*)(code: Seq[Mailbox] => T) = {
+  def withMailboxes[T](addresses: String*)(code: Seq[Mailbox] => T):T = {
     val mailboxes = addresses.map(Mailbox.get)
-    code(mailboxes)
+    val result = code(mailboxes)
     mailboxes.foreach(_.setError(false))
     mailboxes.foreach(_.clear())
+    result
   }
 
-  def withDefaultMailbox[T](code: Mailbox => T) =
+  def withDefaultMailbox[T](code: Mailbox => T):T =
     withMailboxes(fullEmailProperties.toAddress) { mailboxes =>
       code(mailboxes.head)
     }
 
-  def withFaultyMailbox[T](code: Mailbox => T) =
+  def withFaultyMailbox[T](code: Mailbox => T):T =
     withDefaultMailbox { mailbox =>
       mailbox.setError(true)
       code(mailbox)

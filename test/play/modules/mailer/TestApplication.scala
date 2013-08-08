@@ -20,5 +20,7 @@ trait TestApplication extends BeforeAfter {
 
   def before = play.api.Play.start(f)
   
-  def after = Mailbox.clearAll()
+  def after = {
+    Mailbox.clearAll()
+  }
 }

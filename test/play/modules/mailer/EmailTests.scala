@@ -1,12 +1,6 @@
 package play.modules.mailer
 
 import org.specs2.mutable.Specification
-import java.io.ByteArrayOutputStream
-import javax.mail.Address
-import javax.mail.Message
-import javax.mail.internet.MimeMultipart
-import javax.mail.internet.MimeBodyPart
-import java.io.InputStream
 
 object EmailTests extends Specification with TestApplication with FullEmail with FullMessageTest {
 

@@ -1,20 +1,20 @@
 package play.modules.mailer
 
-import org.specs2.mutable.Specification
-import javax.mail.Provider
 import java.util.Properties
-import javax.mail.Provider.Type
+
 import scala.util.Failure
-import javax.mail.Transport
-import javax.mail.Message
-import javax.mail.Address
-import javax.mail.MessagingException
-import javax.mail.URLName
-import javax.mail.NoSuchProviderException
-import javax.mail.PasswordAuthentication
-import javax.mail.Authenticator
-import org.jvnet.mock_javamail.Mailbox
 import scala.util.Success
+
+import org.specs2.mutable.Specification
+
+import javax.mail.Address
+import javax.mail.Message
+import javax.mail.MessagingException
+import javax.mail.NoSuchProviderException
+import javax.mail.Provider
+import javax.mail.Provider.Type
+import javax.mail.Transport
+import javax.mail.URLName
 
 object MailerTests extends Specification with TestApplication
   with FullEmail with FullMessageTest with MailboxUtilities {

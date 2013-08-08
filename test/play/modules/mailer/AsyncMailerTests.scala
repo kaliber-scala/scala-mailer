@@ -1,13 +1,16 @@
 package play.modules.mailer
 
-import org.specs2.mutable.Specification
 import java.util.Properties
+
 import scala.concurrent.Await
 import scala.concurrent.Future
 import scala.concurrent.duration.Duration
 import scala.util.Failure
-import javax.mail.NoSuchProviderException
 import scala.util.Success
+
+import org.specs2.mutable.Specification
+
+import javax.mail.NoSuchProviderException
 
 object AsyncMailerTests extends Specification with TestApplication
   with FullEmail with MailboxUtilities {
