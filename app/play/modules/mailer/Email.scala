@@ -6,7 +6,6 @@ import javax.mail.internet.MimeBodyPart
 import javax.mail.Part
 import javax.mail.internet.MimeMultipart
 import javax.mail.Message
-import javax.mail.util.ByteArrayDataSource
 import java.util.Date
 import javax.activation.DataHandler
 import scala.language.implicitConversions
@@ -23,7 +22,13 @@ case class Email(subject: String, from: EmailAddress, text: String, htmlText: St
 
   def bcc(name: String, address: String) =
     copy(recipients = recipients :+
-      Recipient(RecipientType.CC, EmailAddress(name, address)))
+      Recipient(RecipientType.BCC, EmailAddress(name, address)))
+
+  def replyTo(name: String, address: String) =
+    copy(replyTo = Some(EmailAddress(name, address)))
+
+  def withAttachments(attachments: Attachment*) =
+    copy(attachments = this.attachments ++ attachments)
 
   def createFor(session: Session): Message = {
 
@@ -126,7 +131,12 @@ object Disposition {
   case object Attachment extends Disposition(Part.ATTACHMENT)
 }
 
-case class Attachment(name: String, datasource: DataSource, disposition: Disposition)
+case class Attachment(name: String, datasource: DataSource, disposition: Disposition) {
+  def inline = copy(disposition = Disposition.Inline)
+}
+
+case class ByteArrayDataSource(data: Array[Byte], mimeType: String)
+  extends javax.mail.util.ByteArrayDataSource(data, mimeType)
 
 object Attachment extends ((String, DataSource, Disposition) => Attachment) {
 
@@ -136,7 +146,7 @@ object Attachment extends ((String, DataSource, Disposition) => Attachment) {
   def apply(name: String, data: Array[Byte], mimeType: String, disposition: Disposition): Attachment = {
     require(mimeType matches ".+/.+", "Invalid MIME type, should contain a /")
 
-    val dataSource = new ByteArrayDataSource(data, mimeType)
+    val dataSource = ByteArrayDataSource(data, mimeType)
     dataSource setName name
     apply(name, dataSource, disposition)
   }

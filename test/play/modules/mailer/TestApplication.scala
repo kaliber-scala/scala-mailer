@@ -1,9 +1,10 @@
 package play.modules.mailer
 
-import org.specs2.mutable.Before
 import play.api.test.FakeApplication
+import org.jvnet.mock_javamail.Mailbox
+import org.specs2.mutable.BeforeAfter
 
-trait TestApplication extends Before {
+trait TestApplication extends BeforeAfter {
 
   lazy val configuration = Map(
     "mail.transport.protocol" -> "smtp",
@@ -19,4 +20,5 @@ trait TestApplication extends Before {
 
   def before = play.api.Play.start(f)
   
+  def after = Mailbox.clearAll()
 }
