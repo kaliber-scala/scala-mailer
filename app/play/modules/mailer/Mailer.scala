@@ -12,7 +12,8 @@ class Mailer(val session: Session) {
     tryWithTransport { implicit transport =>
       send(email)
     }.flatten.recoverWith {
-      case cause: TransportCloseException => Failure(cause)
+      case TransportCloseException(result, cause) => 
+        Failure(SendEmailTransportCloseException(result.asInstanceOf[Option[Try[Unit]]], cause))
       case cause: SendEmailException => Failure(cause)
       case cause => Failure(SendEmailException(email, cause))
     }
@@ -21,21 +22,25 @@ class Mailer(val session: Session) {
     tryWithTransport { implicit transport =>
       emails.map(send)
     }.recoverWith {
-      case cause: TransportCloseException => Failure(cause)
+      case TransportCloseException(results, cause) => 
+        Failure(SendEmailsTransportCloseException(results.asInstanceOf[Option[Seq[Try[Unit]]]], cause))
       case cause => Failure(SendEmailsException(emails, cause))
     }
 
   private def tryWithTransport[T](code: Transport => T): Try[T] =
     Try {
       val transport = session.getTransport
+      var result:Option[T] = None
       try {
         transport.connect()
-        code(transport)
+        val codeResult = code(transport)
+        result = Some(codeResult)
+        codeResult
       } finally
         try {
           transport.close()
         } catch {
-          case t: Throwable => throw TransportCloseException(t)
+          case t: Throwable => throw TransportCloseException(result, t)
         }
     }
 
@@ -50,7 +55,9 @@ class Mailer(val session: Session) {
 
 case class SendEmailException(email: Email, cause: Throwable) extends RuntimeException(cause)
 case class SendEmailsException(email: Seq[Email], cause: Throwable) extends RuntimeException(cause)
-case class TransportCloseException(cause: Throwable) extends RuntimeException(cause)
+case class TransportCloseException[T](result:Option[T], cause: Throwable) extends RuntimeException(cause)
+case class SendEmailTransportCloseException(result: Option[Try[Unit]], cause: Throwable) extends RuntimeException(cause)
+case class SendEmailsTransportCloseException(results: Option[Seq[Try[Unit]]], cause: Throwable) extends RuntimeException(cause)
 
 object Mailer extends Mailer(Session.fromConfiguration)
 

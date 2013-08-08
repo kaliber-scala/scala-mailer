@@ -73,7 +73,8 @@ object MailerTests extends Specification with TestApplication
 
         val result = sendMail(session(classOf[FaultyCloseTransport]))
         result must beLike {
-          case Failure(TransportCloseException(t)) =>
+          case Failure(SendEmailTransportCloseException(result, t)) =>
+            result === Some(Success())
             messagingExceptionWithMessage(t, "closeFailed")
         }
       }
@@ -148,7 +149,8 @@ object MailerTests extends Specification with TestApplication
 
         val result = sendMails(session(classOf[FaultyCloseTransport]))
         result must beLike {
-          case Failure(TransportCloseException(t)) =>
+          case Failure(SendEmailsTransportCloseException(results, t)) =>
+            results === Some(Seq(Success(), Success()))
             messagingExceptionWithMessage(t, "closeFailed")
         }
       }
