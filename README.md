@@ -53,6 +53,7 @@ Usage
 
 ``` scala
   import play.modules.mailer._
+  import javax.mail.Message
 
   Mailer.sendEmail(Email(
     subject = "Test mail",
