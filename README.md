@@ -53,13 +53,12 @@ Usage
 
 ``` scala
   import play.modules.mailer._
-  import javax.mail.Message
 
   Mailer.sendEmail(Email(
     subject = "Test mail",
     from = EmailAddress("Erik Westra sender", "ewestra@rhinofly.nl"),
     replyTo = None,
-    recipients = List(Recipient(Message.RecipientType.TO, EmailAddress("Erik Westra recipient", "ewestra@rhinofly.nl"))),
+    recipients = List(Recipient(RecipientType.TO, EmailAddress("Erik Westra recipient", "ewestra@rhinofly.nl"))),
     text = "text",
     htmlText = "htmlText",
     attachments = Seq.empty))
@@ -69,13 +68,12 @@ Usage
 
 ``` scala
     import play.modules.mailer._
-    import javax.mail.Message
 
     AsyncMailer.sendEmail(Email(
       subject = "Test mail",
       from = EmailAddress("Erik Westra sender", "ewestra@rhinofly.nl"),
       replyTo = None,
-      recipients = List(Recipient(Message.RecipientType.TO, EmailAddress("Erik Westra recipient", "ewestra@rhinofly.nl"))),
+      recipients = List(Recipient(RecipientType.TO, EmailAddress("Erik Westra recipient", "ewestra@rhinofly.nl"))),
       text = "text",
       htmlText = "htmlText",
       attachments = Seq.empty))
