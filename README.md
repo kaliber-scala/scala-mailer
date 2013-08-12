@@ -127,7 +127,7 @@ Usage
   import play.modules.mailer._
 
   val result:Future[Unit] = AsyncMailer.sendEmail(email)
-    
+  
   result
     .map { unit =>
       // mail sent successfully
