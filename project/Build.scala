@@ -5,9 +5,9 @@ import play._
 object ApplicationBuild extends Build {
 
   val appName = "play-mailer"
-  val appVersion = "1.2.1"
+  val appVersion = "2.0.0-SNAPSHOT"
 
-  val compileDependencies = Seq("javax.mail" % "mail" % "1.4")
+  val compileDependencies = Seq("javax.mail" % "mail" % "1.4.7")
   val testDependencies = Seq("org.jvnet.mock-javamail" % "mock-javamail" % "1.9" % "test")
   val appDependencies = testDependencies ++ compileDependencies
 
@@ -20,6 +20,7 @@ object ApplicationBuild extends Build {
     organization := "play.modules.mailer",
     resolvers += rhinoflyRepo("RELEASE").get,
     publishTo <<= version(rhinoflyRepo),
-    credentials += Credentials(Path.userHome / ".ivy2" / ".credentials"))
+    credentials += Credentials(Path.userHome / ".ivy2" / ".credentials"),
+    scalacOptions += "-feature")
 
 }
