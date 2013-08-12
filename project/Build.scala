@@ -5,7 +5,7 @@ import play._
 object ApplicationBuild extends Build {
 
   val appName = "play-mailer"
-  val appVersion = "2.0.0"
+  val appVersion = "2.0.0-SNAPSHOT"
 
   val compileDependencies = Seq("javax.mail" % "mail" % "1.4.7")
   val testDependencies = Seq("org.jvnet.mock-javamail" % "mock-javamail" % "1.9" % "test")
