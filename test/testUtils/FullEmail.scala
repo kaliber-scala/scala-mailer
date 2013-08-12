@@ -1,4 +1,11 @@
-package play.modules.mailer
+package testUtils
+
+import play.modules.mailer.Disposition
+import play.modules.mailer.Email
+import play.modules.mailer.EmailAddress
+import play.modules.mailer.Recipient
+import play.modules.mailer.RecipientType
+import play.modules.mailer.Attachment
 
 trait FullEmail {
 

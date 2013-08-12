@@ -1,10 +1,10 @@
 package play.modules
 
 import java.util.Properties
+
 import javax.mail.Authenticator
 import javax.mail.PasswordAuthentication
-import play.modules.mailer.PlayConfiguration
-import play.api.Play.current
+import play.api.Application
 
 package object mailer {
 
@@ -21,7 +21,8 @@ package object mailer {
 
   object Session {
 
-    object keys {
+    class Keys(implicit app: Application) {
+      
       lazy val protocol = PlayConfiguration("mail.transport.protocol", default = "smtps")
       lazy val sslEnable = PlayConfiguration("mail.smtp.ssl.enable", default = "true")
       lazy val host = PlayConfiguration("mail.smtp.host")
@@ -31,8 +32,10 @@ package object mailer {
       lazy val failTo = PlayConfiguration("mail.smtp.failTo")
     }
 
-    lazy val fromConfiguration: Session = {
+    def fromConfiguration(implicit app: Application): Session = {
 
+      val keys = new Keys
+      
       val properties = new Properties()
       properties.put("mail.transport.protocol", keys.protocol)
       properties.put("mail.smtps.quitwait", "false")
@@ -50,7 +53,6 @@ package object mailer {
       javax.mail.Session.getInstance(properties, new Authenticator {
 
         override def getPasswordAuthentication = new PasswordAuthentication(username, password)
-
       })
     }
   }

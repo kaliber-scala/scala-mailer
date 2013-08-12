@@ -1,7 +1,7 @@
 package play.modules.mailer
 
-import play.api.PlayException
 import play.api.Application
+import play.api.PlayException
 
 object PlayConfiguration {
   def apply(key: String, default: Option[String] = None)(implicit app: Application): String =

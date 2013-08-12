@@ -1,6 +1,9 @@
-package play.modules.mailer
+package testUtils
 
 import org.jvnet.mock_javamail.Mailbox
+
+import play.modules.mailer.Email
+import play.modules.mailer.EmailAddress
 
 trait MailboxUtilities { self: FullEmail =>
   

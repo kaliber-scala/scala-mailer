@@ -1,14 +1,14 @@
 package play.modules.mailer
 
-import javax.mail.internet.MimeMessage
+import java.util.Date
+
+import javax.activation.DataHandler
+import javax.mail.Message
+import javax.mail.Part
 import javax.mail.internet.InternetAddress
 import javax.mail.internet.MimeBodyPart
-import javax.mail.Part
+import javax.mail.internet.MimeMessage
 import javax.mail.internet.MimeMultipart
-import javax.mail.Message
-import java.util.Date
-import javax.activation.DataHandler
-import scala.language.implicitConversions
 
 case class Email(subject: String, from: EmailAddress, text: String, htmlText: String, replyTo: Option[EmailAddress] = None, recipients: Seq[Recipient] = Seq.empty, attachments: Seq[Attachment] = Seq.empty) {
 
@@ -103,6 +103,8 @@ case class Email(subject: String, from: EmailAddress, text: String, htmlText: St
         root addBodyPart a
     }
 
+  import scala.language.implicitConversions
+  
   private implicit def emailAddressToInternetAddress(emailAddress: EmailAddress): InternetAddress =
     new InternetAddress(emailAddress.address, emailAddress.name)
 

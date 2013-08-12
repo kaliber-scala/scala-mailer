@@ -1,8 +1,9 @@
-package play.modules.mailer
+package testUtils
 
-import play.api.test.FakeApplication
 import org.jvnet.mock_javamail.Mailbox
 import org.specs2.mutable.BeforeAfter
+
+import play.api.test.FakeApplication
 
 trait TestApplication extends BeforeAfter {
 

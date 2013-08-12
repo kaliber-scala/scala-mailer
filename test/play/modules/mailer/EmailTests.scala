@@ -2,8 +2,13 @@ package play.modules.mailer
 
 import org.specs2.mutable.Specification
 
-object EmailTests extends Specification with TestApplication with FullEmail with FullMessageTest {
+import play.api.Play.current
+import testUtils.FullEmail
+import testUtils.FullMessageTest
+import testUtils.TestApplication
 
+object EmailTests extends Specification with TestApplication with FullEmail with FullMessageTest {
+  
   "Attachment" should {
 
     val name = "testName"

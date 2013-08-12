@@ -1,4 +1,4 @@
-package play.modules.mailer
+package testUtils
 
 import org.specs2.mutable.Specification
 import javax.mail.Message
@@ -6,6 +6,8 @@ import javax.mail.internet.MimeBodyPart
 import java.io.InputStream
 import javax.mail.internet.MimeMultipart
 import javax.mail.Address
+import scala.Array.canBuildFrom
+import javax.mail.Message.RecipientType
 
 trait FullMessageTest { self: Specification with FullEmail =>
 

@@ -15,6 +15,11 @@ import javax.mail.Provider
 import javax.mail.Provider.Type
 import javax.mail.Transport
 import javax.mail.URLName
+import play.api.Play.current
+import testUtils.FullEmail
+import testUtils.FullMessageTest
+import testUtils.MailboxUtilities
+import testUtils.TestApplication
 
 object MailerTests extends Specification with TestApplication
   with FullEmail with FullMessageTest with MailboxUtilities {
@@ -23,7 +28,7 @@ object MailerTests extends Specification with TestApplication
 
     "have the correct default instance" in {
       Mailer must beAnInstanceOf[Mailer]
-      Mailer.session === Session.fromConfiguration
+      Mailer.session must not beNull
     }
 
     import fullEmailProperties._
