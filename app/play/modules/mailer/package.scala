@@ -24,31 +24,28 @@ package object mailer {
     class Keys(implicit app: Application) {
       
       lazy val protocol = PlayConfiguration("mail.transport.protocol", default = "smtps")
-      lazy val sslEnable = PlayConfiguration("mail.smtp.ssl.enable", default = "true")
-      lazy val host = PlayConfiguration("mail.smtp.host")
-      lazy val port = PlayConfiguration("mail.smtp.port")
-      lazy val username = PlayConfiguration("mail.smtp.username")
-      lazy val password = PlayConfiguration("mail.smtp.password")
-      lazy val failTo = PlayConfiguration("mail.smtp.failTo")
+      lazy val host = PlayConfiguration("mail.host")
+      lazy val port = PlayConfiguration("mail.port")
+      lazy val username = PlayConfiguration("mail.username")
+      lazy val password = PlayConfiguration("mail.password")
+      lazy val failTo = PlayConfiguration("mail.failTo")
     }
 
     def fromConfiguration(implicit app: Application): Session = {
 
       val keys = new Keys
+      val protocol = keys.protocol
       
       val properties = new Properties()
-      properties.put("mail.transport.protocol", keys.protocol)
-      properties.put("mail.smtps.quitwait", "false")
-      properties.put("mail.smtps.host", keys.host)
-      properties.put("mail.smtps.port", keys.port)
-      properties.put("mail.smtp.ssl.enable", keys.sslEnable)
-      properties.put("mail.smtp.from", keys.failTo)
+      properties.put(s"mail.transport.protocol", protocol)
+      properties.put(s"mail.$protocol.quitwait", "false")
+      properties.put(s"mail.$protocol.host", keys.host)
+      properties.put(s"mail.$protocol.port", keys.port)
+      properties.put(s"mail.$protocol.from", keys.failTo)
+      properties.put(s"mail.$protocol.auth", "true")
 
       val username = keys.username
       val password = keys.password
-
-      properties.put("mail.smtps.username", username)
-      properties.put("mail.smtps.auth", "true")
 
       javax.mail.Session.getInstance(properties, new Authenticator {
 
