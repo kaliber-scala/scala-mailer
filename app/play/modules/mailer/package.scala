@@ -22,35 +22,41 @@ package object mailer {
   object Session {
 
     class Keys(implicit app: Application) {
-      
+
       lazy val protocol = PlayConfiguration("mail.transport.protocol", default = "smtps")
       lazy val host = PlayConfiguration("mail.host")
       lazy val port = PlayConfiguration("mail.port")
       lazy val username = PlayConfiguration("mail.username")
       lazy val password = PlayConfiguration("mail.password")
       lazy val failTo = PlayConfiguration("mail.failTo")
+      lazy val auth = PlayConfiguration("mail.auth", default = "true")
     }
 
     def fromConfiguration(implicit app: Application): Session = {
 
       val keys = new Keys
       val protocol = keys.protocol
-      
+
       val properties = new Properties()
       properties.put(s"mail.transport.protocol", protocol)
       properties.put(s"mail.$protocol.quitwait", "false")
       properties.put(s"mail.$protocol.host", keys.host)
       properties.put(s"mail.$protocol.port", keys.port)
       properties.put(s"mail.$protocol.from", keys.failTo)
-      properties.put(s"mail.$protocol.auth", "true")
+      properties.put(s"mail.$protocol.auth", keys.auth)
 
-      val username = keys.username
-      val password = keys.password
+      val authenticator =
+        if (keys.auth.toBoolean) {
 
-      javax.mail.Session.getInstance(properties, new Authenticator {
+          val username = keys.username
+          val password = keys.password
 
-        override def getPasswordAuthentication = new PasswordAuthentication(username, password)
-      })
+          new Authenticator {
+            override def getPasswordAuthentication = new PasswordAuthentication(username, password)
+          }
+        } else null
+
+      javax.mail.Session.getInstance(properties, authenticator)
     }
   }
 }

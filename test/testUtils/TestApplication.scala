@@ -9,11 +9,11 @@ trait TestApplication extends BeforeAfter {
 
   lazy val configuration = Map(
     "mail.transport.protocol" -> "smtp",
-    "mail.smtp.host" -> "localhost",
-    "mail.smtp.port" -> "10000",
-    "mail.smtp.failTo" -> "toto@localhost",
-    "mail.smtp.username" -> "foo",
-    "mail.smtp.password" -> "bar")
+    "mail.host" -> "localhost",
+    "mail.port" -> "10000",
+    "mail.failTo" -> "toto@localhost",
+    "mail.username" -> "foo",
+    "mail.password" -> "bar")
 
   def f = FakeApplication(
     path = new java.io.File("./test/"),
