@@ -15,18 +15,18 @@ import testUtils.MailboxUtilities
 object AsyncMailerTests extends Specification with TestApplication
   with FullEmail with MailboxUtilities {
 
-  implicit val ec = play.api.libs.concurrent.Execution.Implicits.defaultContext
+  implicit def ec = play.api.libs.concurrent.Execution.Implicits.defaultContext
 
   "AsyncMailer" should {
 
-    "have the correct default instance" in {
+    "have the correct default instance" in new TestApp {
       AsyncMailer must beAnInstanceOf[AsyncMailer]
       AsyncMailer.mailer === Mailer
     }
 
     "have a method sendMail that" >> {
 
-      "correctly converts a failure to a failed future" in {
+      "correctly converts a failure to a failed future" in new TestApp {
 
         val session = javax.mail.Session.getInstance(new Properties())
         val mailer = new AsyncMailer(new Mailer(session))
@@ -39,7 +39,7 @@ object AsyncMailerTests extends Specification with TestApplication
         }
       }
 
-      "correctly converts a success to a succeeded future" in {
+      "correctly converts a success to a succeeded future" in new TestApp {
 
         val result = await(AsyncMailer.sendEmail(simpleEmail))
         result.value === Some(Success())
@@ -48,7 +48,7 @@ object AsyncMailerTests extends Specification with TestApplication
 
     "have a method sendMails that" >> {
 
-      "correctly converts a failure to a failed future" in {
+      "correctly converts a failure to a failed future" in new TestApp {
 
         val session = javax.mail.Session.getInstance(new Properties())
         val mailer = new AsyncMailer(new Mailer(session))
@@ -61,7 +61,7 @@ object AsyncMailerTests extends Specification with TestApplication
         }
       }
 
-      "correctly converts a success to a succeeded future" in {
+      "correctly converts a success to a succeeded future" in new TestApp {
 
         val result = await(AsyncMailer.sendEmails(simpleEmails))
         result.value === Some(Success(Seq(Success(), Success())))

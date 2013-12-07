@@ -17,6 +17,8 @@ package object mailer {
     val CC: RecipientType = javax.mail.Message.RecipientType.CC
   }
 
+  lazy val Mailer = new Mailer(Session.fromConfiguration(play.api.Play.current))
+  
   type Session = javax.mail.Session
 
   object Session {

@@ -26,7 +26,7 @@ object MailerTests extends Specification with TestApplication
 
   "Mailer" should {
 
-    "have the correct default instance" in {
+    "have the correct default instance" in new TestApp {
       Mailer must beAnInstanceOf[Mailer]
       Mailer.session must not beNull
     }
@@ -84,7 +84,7 @@ object MailerTests extends Specification with TestApplication
         }
       }
 
-      "fails if the mailbox responds in failure" in {
+      "fails if the mailbox responds in failure" in new TestApp {
 
         withFaultyMailbox { mailbox =>
 
@@ -98,7 +98,7 @@ object MailerTests extends Specification with TestApplication
         }
       }
 
-      "correctly sends a full email" in {
+      "correctly sends a full email" in new TestApp {
 
         withDefaultMailbox { mailbox =>
 
@@ -160,7 +160,7 @@ object MailerTests extends Specification with TestApplication
         }
       }
 
-      "partially fails if the mailbox responds in failure for one of the emails" in {
+      "partially fails if the mailbox responds in failure for one of the emails" in new TestApp {
 
         withMailboxes(toAddress, failAddress) { mailboxes =>
 
@@ -178,7 +178,7 @@ object MailerTests extends Specification with TestApplication
         }
       }
 
-      "correctly sends 2 emails" in {
+      "correctly sends 2 emails" in new TestApp {
 
         withDefaultMailbox { mailbox =>
 
@@ -247,5 +247,4 @@ object MailerTests extends Specification with TestApplication
     override def close() =
       throw new MessagingException("closeFailed")
   }
-
 }

@@ -1,11 +1,11 @@
 package testUtils
 
 import org.jvnet.mock_javamail.Mailbox
-import org.specs2.mutable.BeforeAfter
-
 import play.api.test.FakeApplication
+import play.api.test.WithApplication
+import org.specs2.mutable.After
 
-trait TestApplication extends BeforeAfter {
+trait TestApplication extends After {
 
   lazy val configuration = Map(
     "mail.transport.protocol" -> "smtp",
@@ -15,12 +15,12 @@ trait TestApplication extends BeforeAfter {
     "mail.username" -> "foo",
     "mail.password" -> "bar")
 
-  def f = FakeApplication(
+  private def f = FakeApplication(
     path = new java.io.File("./test/"),
     additionalConfiguration = configuration)
 
-  def before = play.api.Play.start(f)
-  
+  abstract class TestApp extends WithApplication(f)
+
   def after = {
     Mailbox.clearAll()
   }

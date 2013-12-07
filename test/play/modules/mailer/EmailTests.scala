@@ -65,7 +65,7 @@ object EmailTests extends Specification with TestApplication with FullEmail with
       email === fullEmail
     }
 
-    "create a javax.mail.Message with the correct parts" in {
+    "create a javax.mail.Message with the correct parts" in new TestApp {
 
       val session = Session.fromConfiguration
 

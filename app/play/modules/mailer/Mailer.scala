@@ -4,7 +4,6 @@ import scala.util.Failure
 import scala.util.Try
 
 import javax.mail.Transport
-import play.api.Play.current
 
 class Mailer(val session: Session) {
 
@@ -58,7 +57,3 @@ case class SendEmailsException(email: Seq[Email], cause: Throwable) extends Runt
 case class TransportCloseException[T](result:Option[T], cause: Throwable) extends RuntimeException(cause)
 case class SendEmailTransportCloseException(result: Option[Try[Unit]], cause: Throwable) extends RuntimeException(cause)
 case class SendEmailsTransportCloseException(results: Option[Seq[Try[Unit]]], cause: Throwable) extends RuntimeException(cause)
-
-object Mailer extends Mailer(Session.fromConfiguration)
-
-
