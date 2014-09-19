@@ -24,6 +24,8 @@ import testUtils.TestApplication
 object MailerTests extends Specification with TestApplication
   with FullEmail with FullMessageTest with MailboxUtilities {
 
+  sequential
+
   "Mailer" should {
 
     "have the correct default instance" in new TestApp {
