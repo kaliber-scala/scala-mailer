@@ -5,7 +5,7 @@ Each new project we start is being developed in Scala. Therefore, we are in need
 Are you the Scala programmer we are looking for? Take a look at the [job description](http://rhinofly.nl/vacatures/vacature-scala.html) (in Dutch) and give the Scala puzzle a try! Send us your solution and you will be invited for a job interview.
 * * *
 
-Scala mailer module for Play 2.2.x
+Scala mailer module for Play 2.3.x
 =====================================================
 
 Scala wrapper around java mail which allows you to send emails. The default configuration options exposed in Configuration work using Amazon SES SMTP
@@ -15,7 +15,7 @@ Installation
 
 ``` scala
   val appDependencies = Seq(
-    "play.modules.mailer" %% "play-mailer" % "2.1.3"
+    "play.modules.mailer" %% "play-mailer" % "2.3.0"
   )
   
   val main = PlayProject(appName, appVersion, appDependencies, mainLang = SCALA).settings(
