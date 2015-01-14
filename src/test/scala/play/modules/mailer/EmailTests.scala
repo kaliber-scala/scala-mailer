@@ -8,7 +8,7 @@ import testUtils.FullMessageTest
 import testUtils.TestApplication
 
 object EmailTests extends Specification with TestApplication with FullEmail with FullMessageTest {
-  
+
   "Attachment" should {
 
     val name = "testName"
@@ -47,10 +47,11 @@ object EmailTests extends Specification with TestApplication with FullEmail with
 
   "Email" should {
 
-    "have utility methods to easily create an email" in {
+    "have utility methods to easily create an htmlEmail" in {
       import fullEmailProperties._
       val email =
-        Email(subject, EmailAddress(fromName, fromAddress), textContent, htmlTextContent)
+        Email(subject, EmailAddress(fromName, fromAddress), textContent)
+          .withHtmlText(htmlTextContent)
           .to(toName, toAddress)
           .cc(ccName, ccAddress)
           .bcc(bccName, bccAddress)
@@ -65,13 +66,30 @@ object EmailTests extends Specification with TestApplication with FullEmail with
       email === fullEmail
     }
 
-    "create a javax.mail.Message with the correct parts" in new TestApp {
+    "have utility methods to easily create an textEmail" in {
+      import fullEmailProperties._
 
+      val email =
+        Email(subject, EmailAddress(fromName, fromAddress), textContent, None)
+          .to(toName, toAddress)
+          .cc(ccName, ccAddress)
+          .bcc(bccName, bccAddress)
+          .replyTo(replyToName, replyToAddress)
+          .withAttachments(
+            Attachment(attachmentName, attachmentData, attachmentMimeType),
+            Attachment(
+              inlineAttachmentName,
+              inlineAttachmentData,
+              inlineAttachmentMimeType).inline)
+
+      email === textEmail
+    }
+
+    "create a javax.mail.Message with the correct parts" in new TestApp {
       val session = Session.fromConfiguration
 
-      val message = fullEmail createFor session
-
-      fullMessageTest(message)
+      val fullMessage = fullEmail createFor session
+      fullMessageTest(fullMessage)
     }
   }
 }
