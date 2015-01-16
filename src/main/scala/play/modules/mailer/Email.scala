@@ -10,7 +10,10 @@ import javax.mail.internet.MimeBodyPart
 import javax.mail.internet.MimeMessage
 import javax.mail.internet.MimeMultipart
 
-case class Email(subject: String, from: EmailAddress, text: String, htmlText: String, replyTo: Option[EmailAddress] = None, recipients: Seq[Recipient] = Seq.empty, attachments: Seq[Attachment] = Seq.empty) {
+case class Email(subject: String, from: EmailAddress, text: String, htmlText: Option[String] = None, replyTo: Option[EmailAddress] = None, recipients: Seq[Recipient] = Seq.empty, attachments: Seq[Attachment] = Seq.empty) {
+
+  def withHtmlText(htmlText: String) =
+    copy(htmlText = Some(htmlText))
 
   def to(name: String, address: String) =
     copy(recipients = recipients :+
@@ -37,7 +40,7 @@ case class Email(subject: String, from: EmailAddress, text: String, htmlText: St
     val message = createMimeMessage(session, root)
     addRecipients(message)
     addTextPart(alternative)
-    addHtmlPart(alternative)
+    htmlText.foreach(addHtmlPart(alternative))
     addAttachments(root, related)
 
     message.saveChanges()
@@ -89,7 +92,7 @@ case class Email(subject: String, from: EmailAddress, text: String, htmlText: St
     alternative addBodyPart messagePart
   }
 
-  private def addHtmlPart(alternative: Alternative): Unit = {
+  private def addHtmlPart(alternative: Alternative)(htmlText: String): Unit = {
     val messagePartHtml = new MimeBodyPart
     messagePartHtml setContent (htmlText, "text/html; charset=UTF-8")
     alternative addBodyPart messagePartHtml
@@ -104,7 +107,7 @@ case class Email(subject: String, from: EmailAddress, text: String, htmlText: St
     }
 
   import scala.language.implicitConversions
-  
+
   private implicit def emailAddressToInternetAddress(emailAddress: EmailAddress): InternetAddress =
     new InternetAddress(emailAddress.address, emailAddress.name)
 
@@ -122,6 +125,20 @@ case class Email(subject: String, from: EmailAddress, text: String, htmlText: St
 
     attachmentPart
   }
+}
+
+object Email {
+  def apply(subject: String, from: EmailAddress, text: String, htmlText: String): Email =
+    new Email(subject, from, text, Some(htmlText))
+
+  def apply(subject: String, from: EmailAddress, text: String, htmlText: String, replyTo: Option[EmailAddress]): Email =
+    new Email(subject, from, text, Some(htmlText), replyTo)
+
+  def apply(subject: String, from: EmailAddress, text: String, htmlText: String, replyTo: Option[EmailAddress], recipients: Seq[Recipient]): Email =
+    new Email(subject, from, text, Some(htmlText), replyTo, recipients)
+
+  def apply(subject: String, from: EmailAddress, text: String, htmlText: String, replyTo: Option[EmailAddress], recipients: Seq[Recipient], attachments: Seq[Attachment]): Email =
+    new Email(subject, from, text, Some(htmlText), replyTo, recipients, attachments)
 }
 
 case class EmailAddress(name: String, address: String)

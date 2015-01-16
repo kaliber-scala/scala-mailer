@@ -55,4 +55,29 @@ trait FullEmail {
           inlineAttachmentName, inlineAttachmentData, inlineAttachmentMimeType,
           Disposition.Inline)))
   }
+  
+  val textEmail = {
+    import fullEmailProperties._
+
+    Email(subject,
+      EmailAddress(fromName, fromAddress),
+      textContent,
+      None,
+      replyTo = Some(EmailAddress(replyToName, replyToAddress)),
+      recipients = Seq(
+        Recipient(
+          tpe = RecipientType.TO,
+          emailAddress = EmailAddress(toName, toAddress)),
+        Recipient(
+          tpe = RecipientType.CC,
+          emailAddress = EmailAddress(ccName, ccAddress)),
+        Recipient(
+          tpe = RecipientType.BCC,
+          emailAddress = EmailAddress(bccName, bccAddress))),
+      attachments = Seq(
+        Attachment(attachmentName, attachmentData, attachmentMimeType),
+        Attachment(
+          inlineAttachmentName, inlineAttachmentData, inlineAttachmentMimeType,
+          Disposition.Inline)))
+  }
 }

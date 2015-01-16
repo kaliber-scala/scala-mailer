@@ -42,7 +42,7 @@ object AsyncMailerTests extends Specification with TestApplication
       "correctly converts a success to a succeeded future" in new TestApp {
 
         val result = await(AsyncMailer.sendEmail(simpleEmail))
-        result.value === Some(Success())
+        result.value === Some(Success(()))
       }
     }
 
@@ -64,7 +64,7 @@ object AsyncMailerTests extends Specification with TestApplication
       "correctly converts a success to a succeeded future" in new TestApp {
 
         val result = await(AsyncMailer.sendEmails(simpleEmails))
-        result.value === Some(Success(Seq(Success(), Success())))
+        result.value === Some(Success(Seq(Success(()), Success(()))))
       }
     }
   }

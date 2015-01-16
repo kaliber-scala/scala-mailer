@@ -13,8 +13,8 @@ trait MailboxUtilities { self: FullEmail =>
     Email(
       subject,
       EmailAddress(fromName, fromAddress),
-      textContent,
-      htmlTextContent)
+      textContent)
+      .withHtmlText(htmlTextContent)
       .to(toName, toAddress)
   }
 
