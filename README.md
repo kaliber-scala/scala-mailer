@@ -15,7 +15,7 @@ Installation
 
 ``` scala
   val appDependencies = Seq(
-    "nl.rhinofly" %% "play-mailer" % "2.2.0"
+    "nl.rhinofly" %% "play-mailer" % "3.0.0"
   )
   
   val main = PlayProject(appName, appVersion, appDependencies, mainLang = SCALA).settings(
