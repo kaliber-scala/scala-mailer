@@ -97,7 +97,7 @@ Usage
         //failed to close the connection, no email was sent
     case Failure(SendEmailTransportCloseException(Some(Success(_)), cause)) =>
         //failed to close the connection, the email was sent
-    case Failure(SendEmailTransportCloseException(Some(Failure(SendEmailException(email, cause1)), cause2)) =>
+    case Failure(SendEmailTransportCloseException(Some(Failure(SendEmailException(email, cause1))), cause2)) =>
         //failed to close the connection, the email was not sent
   }
   
