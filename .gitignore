@@ -8,7 +8,10 @@ tmp
 dist/.project
 /.classpath
 /.cache
+/.cache-main
+/.cache-tests
 /.settings
 /.project
 test/conf
 .target
+.directory

@@ -2,7 +2,6 @@ package play.modules.mailer
 
 import org.specs2.mutable.Specification
 
-import play.api.Play.current
 import testUtils.FullEmail
 import testUtils.FullMessageTest
 import testUtils.TestApplication
