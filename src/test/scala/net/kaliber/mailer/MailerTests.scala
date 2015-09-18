@@ -1,12 +1,9 @@
-package play.modules.mailer
+package net.kaliber.mailer
 
 import java.util.Properties
-
 import scala.util.Failure
 import scala.util.Success
-
 import org.specs2.mutable.Specification
-
 import javax.mail.Address
 import javax.mail.Message
 import javax.mail.MessagingException
@@ -16,6 +13,11 @@ import javax.mail.Provider.Type
 import javax.mail.Transport
 import javax.mail.URLName
 import play.api.Play.current
+import scala.concurrent.Await
+import scala.concurrent.Future
+import scala.concurrent.duration._
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.util.Try
 import testUtils.FullEmail
 import testUtils.FullMessageTest
 import testUtils.MailboxUtilities
@@ -27,11 +29,6 @@ object MailerTests extends Specification with TestApplication
   sequential
 
   "Mailer" should {
-
-    "have the correct default instance" in new TestApp {
-      Mailer must beAnInstanceOf[Mailer]
-      Mailer.session must not beNull
-    }
 
     import fullEmailProperties._
 
@@ -193,15 +190,18 @@ object MailerTests extends Specification with TestApplication
     }
   }
 
-  def sendMail(session: Session = Session.fromConfiguration, email: Email = simpleEmail) = {
+  def sendMail(session: Session = Session.fromApplication, email: Email = simpleEmail) = {
     val mailer = new Mailer(session)
-    mailer.sendEmail(email)
+    futureToTry(mailer.sendEmail(email))
   }
 
-  def sendMails(session: Session = Session.fromConfiguration, emails: Seq[Email] = simpleEmails) = {
+  def sendMails(session: Session = Session.fromApplication, emails: Seq[Email] = simpleEmails) = {
     val mailer = new Mailer(session)
-    mailer.sendEmails(emails)
+    futureToTry(mailer.sendEmails(emails))
   }
+
+  def futureToTry[T](future: Future[T]): Try[T] =
+    Await.ready(future, 1.second).value.get
 
   def messagingExceptionWithMessage(t: Throwable, message: String) = {
     t must beAnInstanceOf[MessagingException]

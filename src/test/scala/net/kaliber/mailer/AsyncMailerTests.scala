@@ -1,13 +1,17 @@
-package play.modules.mailer
+package net.kaliber.mailer
 
 import java.util.Properties
+
 import scala.concurrent.Await
 import scala.concurrent.Future
 import scala.concurrent.duration.Duration
 import scala.util.Failure
 import scala.util.Success
+
 import org.specs2.mutable.Specification
+
 import javax.mail.NoSuchProviderException
+
 import testUtils.TestApplication
 import testUtils.FullEmail
 import testUtils.MailboxUtilities
@@ -19,17 +23,12 @@ object AsyncMailerTests extends Specification with TestApplication
 
   "AsyncMailer" should {
 
-    "have the correct default instance" in new TestApp {
-      AsyncMailer must beAnInstanceOf[AsyncMailer]
-      AsyncMailer.mailer === Mailer
-    }
-
     "have a method sendMail that" >> {
 
       "correctly converts a failure to a failed future" in new TestApp {
 
         val session = javax.mail.Session.getInstance(new Properties())
-        val mailer = new AsyncMailer(new Mailer(session))
+        val mailer = new Mailer(session)
 
         val result = await(mailer.sendEmail(simpleEmail))
         result.value must beLike {
@@ -41,7 +40,7 @@ object AsyncMailerTests extends Specification with TestApplication
 
       "correctly converts a success to a succeeded future" in new TestApp {
 
-        val result = await(AsyncMailer.sendEmail(simpleEmail))
+        val result = await(new Mailer(Session.fromApplication).sendEmail(simpleEmail))
         result.value === Some(Success(()))
       }
     }
@@ -51,7 +50,7 @@ object AsyncMailerTests extends Specification with TestApplication
       "correctly converts a failure to a failed future" in new TestApp {
 
         val session = javax.mail.Session.getInstance(new Properties())
-        val mailer = new AsyncMailer(new Mailer(session))
+        val mailer = new Mailer(session)
 
         val result = await(mailer.sendEmails(simpleEmails))
         result.value must beLike {
@@ -63,7 +62,7 @@ object AsyncMailerTests extends Specification with TestApplication
 
       "correctly converts a success to a succeeded future" in new TestApp {
 
-        val result = await(AsyncMailer.sendEmails(simpleEmails))
+        val result = await(new Mailer(Session.fromApplication).sendEmails(simpleEmails))
         result.value === Some(Success(Seq(Success(()), Success(()))))
       }
     }

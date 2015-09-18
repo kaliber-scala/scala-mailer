@@ -8,12 +8,10 @@ Installation
 
 ``` scala
   val appDependencies = Seq(
-    "nl.rhinofly" %% "play-mailer" % "3.1.0"
+    "net.kaliber" %% "play-mailer" % "4.0.0"
   )
 
-  val main = PlayProject(appName, appVersion, appDependencies, mainLang = SCALA).settings(
-    resolvers += "Rhinofly Internal Release Repository" at "http://maven-repository.rhinofly.net:8081/artifactory/libs-release-local"
-  )
+  resolvers += "Kaliber Repository" at "https://jars.kaliber.io/artifactory/libs-release-local"
 ```
 
 Configuration
@@ -56,7 +54,7 @@ Usage
     htmlText = "htmlText",
     replyTo = None,
     recipients = List(Recipient(
-    	RecipientType.TO, EmailAddress("Erik Westra recipient", "ewestra@rhinofly.nl"))),
+      RecipientType.TO, EmailAddress("Erik Westra recipient", "ewestra@rhinofly.nl"))),
     attachments = Seq.empty)
 
   // a more convenient way to create an email
@@ -70,8 +68,8 @@ Usage
     .bcc("Erik Westra BCC", "ewestra+bcc@rhinofly.nl")
     .replyTo("Erik Westra REPLY_TO", "ewestra+replyTo@rhinofly.nl")
     .withAttachments(
-    	Attachment("attachment1", Array[Byte](0, 1), "application/octet-stream"),
-    	Attachment("attachment2", Array[Byte](0, 1), "application/octet-stream", Disposition.Inline))
+      Attachment("attachment1", Array[Byte](0, 1), "application/octet-stream"),
+      Attachment("attachment2", Array[Byte](0, 1), "application/octet-stream", Disposition.Inline))
 ```
 
 ### Sending an email synchronously
@@ -83,9 +81,9 @@ Usage
 
   result match {
     case Success(_) =>
-    	//mail sent successfully
+      //mail sent successfully
     case Failure(SendEmailException(email, cause)) =>
-    	//failed to send email, cause provides more information
+      //failed to send email, cause provides more information
     case Failure(SendEmailTransportCloseException(None, cause)) =>
         //failed to close the connection, no email was sent
     case Failure(SendEmailTransportCloseException(Some(Success(_)), cause)) =>
@@ -152,7 +150,7 @@ Usage
         case Failure(SendEmailException(email, cause)) =>
           //failed to send email, cause provides more information
       }
-  	}
+    }
     .recover {
       case SendEmailException(email, cause) =>
         // problem sending email

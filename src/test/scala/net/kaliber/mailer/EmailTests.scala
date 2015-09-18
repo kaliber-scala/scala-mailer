@@ -1,4 +1,4 @@
-package play.modules.mailer
+package net.kaliber.mailer
 
 import org.specs2.mutable.Specification
 
@@ -66,7 +66,7 @@ object EmailTests extends Specification with TestApplication with FullEmail with
     }
 
     "have utility methods to easily create an textEmail" in {
-      import fullEmailProperties._
+import fullEmailProperties._
 
       val email =
         Email(subject, EmailAddress(fromName, fromAddress), textContent, None)
@@ -85,7 +85,7 @@ object EmailTests extends Specification with TestApplication with FullEmail with
     }
 
     "create a javax.mail.Message with the correct parts" in new TestApp {
-      val session = Session.fromConfiguration
+      val session = Session.fromApplication
 
       val fullMessage = fullEmail createFor session
       fullMessageTest(fullMessage)

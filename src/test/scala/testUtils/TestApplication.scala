@@ -15,9 +15,7 @@ trait TestApplication extends After {
     "mail.username" -> "foo",
     "mail.password" -> "bar")
 
-  private def f = FakeApplication(
-    path = new java.io.File("./test/"),
-    additionalConfiguration = configuration)
+  private def f = FakeApplication(additionalConfiguration = configuration)
 
   abstract class TestApp extends WithApplication(f)
 

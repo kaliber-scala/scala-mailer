@@ -1,11 +1,11 @@
 package testUtils
 
-import play.modules.mailer.Disposition
-import play.modules.mailer.Email
-import play.modules.mailer.EmailAddress
-import play.modules.mailer.Recipient
-import play.modules.mailer.RecipientType
-import play.modules.mailer.Attachment
+import net.kaliber.mailer.Disposition
+import net.kaliber.mailer.Email
+import net.kaliber.mailer.EmailAddress
+import net.kaliber.mailer.Recipient
+import net.kaliber.mailer.RecipientType
+import net.kaliber.mailer.Attachment
 
 trait FullEmail {
 
@@ -55,7 +55,7 @@ trait FullEmail {
           inlineAttachmentName, inlineAttachmentData, inlineAttachmentMimeType,
           Disposition.Inline)))
   }
-  
+
   val textEmail = {
     import fullEmailProperties._
 

@@ -2,11 +2,11 @@ package testUtils
 
 import org.jvnet.mock_javamail.Mailbox
 
-import play.modules.mailer.Email
-import play.modules.mailer.EmailAddress
+import net.kaliber.mailer.Email
+import net.kaliber.mailer.EmailAddress
 
 trait MailboxUtilities { self: FullEmail =>
-  
+
   val simpleEmail = {
     import fullEmailProperties._
 

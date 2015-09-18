@@ -1,38 +1,38 @@
 package testUtils
 
-import org.specs2.mutable.Specification
+import java.io.InputStream
 import javax.mail.Message
 import javax.mail.internet.MimeBodyPart
-import java.io.InputStream
 import javax.mail.internet.MimeMultipart
 import javax.mail.Address
-import scala.Array.canBuildFrom
 import javax.mail.Message.RecipientType
+import org.specs2.mutable.Specification
+import scala.Array.canBuildFrom
 
 trait FullMessageTest { self: Specification with FullEmail =>
 
   def fullMessageTest(message: Message) = {
 
     /*
-      	Message
-      	|
-      	|_ MimeMultipart - multipart/mixed
-      	  |
-      	  |
-      	  |_ MimeBodyPart
-      	  | |
-      	  | |_ MimeMultipart - multipart/related
-      	  |   |
-      	  |   |_ MimeBodyPart
-      	  |   | |
-      	  |   | |_ MimeMultipart - multipart/alternative
-      	  |   |   |
-      	  |   |   |_ MimeBodyPart - text/plain
-      	  |   |   |_ MimeBodyPart - text/html
-      	  |   |
-      	  |   |_ MimeBodyPart - inline/type
-      	  |
-      	  |_ MimeBodyPart - attachment/type   
+        Message
+        |
+        |_ MimeMultipart - multipart/mixed
+          |
+          |
+          |_ MimeBodyPart
+          | |
+          | |_ MimeMultipart - multipart/related
+          |   |
+          |   |_ MimeBodyPart
+          |   | |
+          |   | |_ MimeMultipart - multipart/alternative
+          |   |   |
+          |   |   |_ MimeBodyPart - text/plain
+          |   |   |_ MimeBodyPart - text/html
+          |   |
+          |   |_ MimeBodyPart - inline/type
+          |
+          |_ MimeBodyPart - attachment/type
        */
 
     import fullEmailProperties._

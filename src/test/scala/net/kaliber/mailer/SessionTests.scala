@@ -1,38 +1,37 @@
-package play.modules.mailer
+package net.kaliber.mailer
 
 import org.specs2.mutable.Specification
-
 import play.api.test.FakeApplication
+import play.api.Configuration
 
 object SessionTests extends Specification {
 
-  lazy val configuration = Map(
+  lazy val configurationValues = Map(
     "mail.transport.protocol" -> "protocol",
     "mail.host" -> "localhost",
     "mail.port" -> "10000",
     "mail.failTo" -> "toto@localhost",
     "mail.username" -> "foo",
-    "mail.password" -> "bar")
+    "mail.password" -> "bar"
+  )
 
-  def configuredApplication(configuration:Map[String, String] = configuration) = FakeApplication(
-    path = new java.io.File("./test/"),
-    additionalConfiguration = configuration)
+  lazy val configuration = Configuration from configurationValues
 
   "Session" should {
 
     "have have the correct default protocol" in {
 
-      new Session.Keys()(FakeApplication()).protocol === "smtps"
+      new Session.Keys(Configuration.empty).protocol === "smtps"
     }
-    
+
     "have have the correct default value for auth" in {
-    	
-    	new Session.Keys()(FakeApplication()).auth === "true"
+
+      new Session.Keys(Configuration.empty).auth === "true"
     }
 
     "extract the correct information from the configuration" in {
 
-      val session = Session.fromConfiguration(configuredApplication())
+      val session = Session.fromConfiguration(configuration)
 
       val properties = session.getProperties
 
@@ -52,10 +51,10 @@ object SessionTests extends Specification {
 
     "allow for a configuration that disables authentication" in {
 
-      lazy val configurationWithoutAuth = 
-        configuration - ("mail.username") - ("mail.password") + ("mail.auth" -> "false")
+      lazy val configurationWithoutAuth =
+        configurationValues - ("mail.username") - ("mail.password") + ("mail.auth" -> "false")
 
-      val session = Session.fromConfiguration(configuredApplication(configurationWithoutAuth))
+      val session = Session.fromConfiguration(Configuration from configurationWithoutAuth)
 
       val properties = session.getProperties
 

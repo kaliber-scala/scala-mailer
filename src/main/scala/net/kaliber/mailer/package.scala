@@ -1,10 +1,11 @@
-package play.modules
+package net.kaliber
 
 import java.util.Properties
-
 import javax.mail.Authenticator
 import javax.mail.PasswordAuthentication
 import play.api.Application
+import play.api.Configuration
+import play.api.PlayException
 
 package object mailer {
 
@@ -17,26 +18,33 @@ package object mailer {
     val CC: RecipientType = javax.mail.Message.RecipientType.CC
   }
 
-  lazy val Mailer = new Mailer(Session.fromConfiguration(play.api.Play.current))
-  
   type Session = javax.mail.Session
 
   object Session {
 
-    class Keys(implicit app: Application) {
+    class Keys(configuration: Configuration) {
 
-      lazy val protocol = PlayConfiguration("mail.transport.protocol", default = "smtps")
-      lazy val host = PlayConfiguration("mail.host")
-      lazy val port = PlayConfiguration("mail.port")
-      lazy val username = PlayConfiguration("mail.username")
-      lazy val password = PlayConfiguration("mail.password")
-      lazy val failTo = PlayConfiguration("mail.failTo")
-      lazy val auth = PlayConfiguration("mail.auth", default = "true")
+      def error(key: String) = throw new PlayException("Configuration error", s"Could not find $key in settings")
+
+      def getString(key: String, default: Option[String] = None): String =
+        configuration getString key orElse default getOrElse error(key)
+
+      def getString(key: String, default: String): String = getString(key, Some(default))
+
+      lazy val protocol = getString("mail.transport.protocol", default = "smtps")
+      lazy val host = getString("mail.host")
+      lazy val port = getString("mail.port")
+      lazy val username = getString("mail.username")
+      lazy val password = getString("mail.password")
+      lazy val failTo = getString("mail.failTo")
+      lazy val auth = getString("mail.auth", default = "true")
     }
 
-    def fromConfiguration(implicit app: Application): Session = {
+    def fromApplication(implicit app: Application): Session = fromConfiguration(app.configuration)
 
-      val keys = new Keys
+    def fromConfiguration(configuration: Configuration): Session = {
+
+      val keys = new Keys(configuration)
       val protocol = keys.protocol
 
       val properties = new Properties()
