@@ -1,12 +1,12 @@
 package net.kaliber.mailer
 
 import org.specs2.mutable.Specification
-
 import testUtils.FullEmail
 import testUtils.FullMessageTest
 import testUtils.TestApplication
 
 object EmailTests extends Specification with TestApplication with FullEmail with FullMessageTest {
+  sequential
 
   "Attachment" should {
 
