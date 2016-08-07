@@ -18,6 +18,7 @@ import testUtils.MailboxUtilities
 
 object AsyncMailerTests extends Specification with TestApplication
   with FullEmail with MailboxUtilities {
+  sequential
 
   implicit def ec = play.api.libs.concurrent.Execution.Implicits.defaultContext
 
