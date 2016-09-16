@@ -1,4 +1,4 @@
-Scala mailer module for Play 2.4.x
+Scala mailer module for Play 2.5.x
 =====================================================
 
 Scala wrapper around java mail which allows you to send emails. The default configuration options exposed in Configuration work using Amazon SES SMTP
@@ -8,7 +8,7 @@ Installation
 
 ``` scala
   val appDependencies = Seq(
-    "net.kaliber" %% "play-mailer" % "4.0.0"
+    "net.kaliber" %% "play-mailer" % "5.0.0"
   )
 
   resolvers += "Kaliber Repository" at "https://jars.kaliber.io/artifactory/libs-release-local"
