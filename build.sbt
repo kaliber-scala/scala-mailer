@@ -9,7 +9,7 @@ resolvers ++= Seq(
   "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases" /* specs2-core depends on scalaz-stream */
 )
 
-val playVersion = "2.5.4"
+val playVersion = "2.5.0"
 
 libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play" % playVersion % "provided" /* match all versions that are equal or higher */,
