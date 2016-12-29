@@ -1,12 +1,10 @@
 package net.kaliber.mailer
 
 import org.specs2.mutable.Specification
+import testUtils.{FullEmail, FullMessageTest, TestApplication, TestSettings}
 
-import testUtils.FullEmail
-import testUtils.FullMessageTest
-import testUtils.TestApplication
-
-object EmailTests extends Specification with TestApplication with FullEmail with FullMessageTest {
+object EmailTests extends Specification with TestApplication
+  with FullEmail with FullMessageTest {
 
   "Attachment" should {
 
@@ -66,7 +64,7 @@ object EmailTests extends Specification with TestApplication with FullEmail with
     }
 
     "have utility methods to easily create an textEmail" in {
-import fullEmailProperties._
+      import fullEmailProperties._
 
       val email =
         Email(subject, EmailAddress(fromName, fromAddress), textContent, None)
@@ -84,8 +82,8 @@ import fullEmailProperties._
       email === textEmail
     }
 
-    "create a javax.mail.Message with the correct parts" in new TestApp {
-      val session = Session.fromApplication
+    "create a javax.mail.Message with the correct parts" in {
+      val session = Session.fromSetting(TestSettings.mailerSettings)
 
       val fullMessage = fullEmail createFor session
       fullMessageTest(fullMessage)
