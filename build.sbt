@@ -20,7 +20,7 @@ lazy val core = (project in file("core"))
       "javax.mail" % "mail" % "1.4.7"
     )
   )
-  .settings(publishSettings: _*)
+  .settings(bintraySettings: _*)
   .settings(testSettings: _*)
 
 lazy val play = (project in file("play"))
@@ -28,7 +28,7 @@ lazy val play = (project in file("play"))
     name := "scala-mailer-play"
   )
   .settings(commonSettings: _*)
-  .settings(publishSettings: _*)
+  .settings(bintraySettings: _*)
   .settings(testSettings: _*)
   .settings(playSettings: _*)
   .dependsOn(core % "compile->compile;test->test")
@@ -38,12 +38,17 @@ lazy val root = (project in file("."))
     name := "scala-mailer",
     publishArtifact := false
   )
-  .settings(publishSettings: _*)
+  .settings(bintraySettings: _*)
+  .settings(
+    bintrayRelease := (),
+    bintrayReleaseOnPublish := false,
+    bintrayUnpublish := ()
+  )
   .aggregate(core, play)
 
 
 lazy val playSettings = {
-  val playVersion = "2.5.0"
+  val playVersion = "2.5.11"
 
   libraryDependencies ++= Seq(
     "com.typesafe.play" %% "play" % playVersion % "provided",
@@ -59,13 +64,27 @@ lazy val testSettings = Seq(
   )
 )
 
-lazy val publishSettings = Seq(
-  publishTo := {
-    val repo = if (version.value endsWith "SNAPSHOT") "snapshot" else "release"
-    Some("Kaliber Internal " + repo.capitalize + " Repository" at "https://jars.kaliber.io/artifactory/libs-" + repo + "-local")
-  }
+lazy val bintraySettings = Seq(
+  licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
+  homepage := Some(url("https://github.com/kaliber-scala/scala-mailer")),
+  bintrayOrganization := Some("kaliber-scala"),
+  bintrayReleaseOnPublish := false,
+  publishMavenStyle := true,
+  
+  pomExtra := (
+    <scm>
+        <connection>scm:git@github.com:kaliber-scala/scala-mailer.git</connection>
+        <developerConnection>scm:git@github.com:kaliber-scala/scala-mailer.git</developerConnection>
+        <url>https://github.com/kaliber-scala/scala-mailer</url>
+    </scm>
+    <developers>
+        <developer>
+        <id>Kaliber</id>
+        <name>Kaliber Interactive</name>
+        <url>https://kaliber.net/</url>
+        </developer>
+    </developers>
+    )
 )
 
 fork in Test := true
-
-credentials += Credentials(Path.userHome / ".ivy2" / ".credentials")
