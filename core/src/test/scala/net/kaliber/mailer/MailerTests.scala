@@ -1,6 +1,7 @@
 package net.kaliber.mailer
 
 import java.util.Properties
+
 import scala.util.Failure
 import scala.util.Success
 import org.specs2.mutable.Specification
@@ -12,20 +13,16 @@ import javax.mail.Provider
 import javax.mail.Provider.Type
 import javax.mail.Transport
 import javax.mail.URLName
-import play.api.Play.current
+
 import scala.concurrent.Await
 import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Try
-import testUtils.FullEmail
-import testUtils.FullMessageTest
-import testUtils.MailboxUtilities
-import testUtils.TestApplication
+import testUtils._
 
 object MailerTests extends Specification with TestApplication
   with FullEmail with FullMessageTest with MailboxUtilities {
-
   sequential
 
   "Mailer" should {
@@ -83,7 +80,7 @@ object MailerTests extends Specification with TestApplication
         }
       }
 
-      "fails if the mailbox responds in failure" in new TestApp {
+      "fails if the mailbox responds in failure" in {
 
         withFaultyMailbox { mailbox =>
 
@@ -97,7 +94,7 @@ object MailerTests extends Specification with TestApplication
         }
       }
 
-      "correctly sends a full email" in new TestApp {
+      "correctly sends a full email" in {
 
         withDefaultMailbox { mailbox =>
 
@@ -140,8 +137,8 @@ object MailerTests extends Specification with TestApplication
         val result = sendMails(session(classOf[FaultyMessageTransport]))
         result must beLike {
           case Success(Seq(
-            Failure(SendEmailException(email1, t1)),
-            Failure(SendEmailException(email2, t2)))) =>
+          Failure(SendEmailException(email1, t1)),
+          Failure(SendEmailException(email2, t2)))) =>
             email1 === simpleEmail
             email2 === simpleFailEmail
             messagingExceptionWithMessage(t1, "sendMessageFailed")
@@ -159,7 +156,7 @@ object MailerTests extends Specification with TestApplication
         }
       }
 
-      "partially fails if the mailbox responds in failure for one of the emails" in new TestApp {
+      "partially fails if the mailbox responds in failure for one of the emails" in {
 
         withMailboxes(toAddress, failAddress) { mailboxes =>
 
@@ -177,7 +174,7 @@ object MailerTests extends Specification with TestApplication
         }
       }
 
-      "correctly sends 2 emails" in new TestApp {
+      "correctly sends 2 emails" in {
 
         withDefaultMailbox { mailbox =>
 
@@ -190,12 +187,14 @@ object MailerTests extends Specification with TestApplication
     }
   }
 
-  def sendMail(session: Session = Session.fromApplication, email: Email = simpleEmail) = {
+  lazy val defaultSession = Session.fromSetting(TestSettings.mailerSettings)
+
+  def sendMail(session: Session = defaultSession, email: Email = simpleEmail) = {
     val mailer = new Mailer(session)
     futureToTry(mailer.sendEmail(email))
   }
 
-  def sendMails(session: Session = Session.fromApplication, emails: Seq[Email] = simpleEmails) = {
+  def sendMails(session: Session = defaultSession, emails: Seq[Email] = simpleEmails) = {
     val mailer = new Mailer(session)
     futureToTry(mailer.sendEmails(emails))
   }
@@ -241,7 +240,7 @@ object MailerTests extends Specification with TestApplication
   class FaultyCloseTransport(session: Session, urlname: URLName) extends Transport(session, urlname) {
 
     def sendMessage(msg: Message, addresses: Array[Address]) =
-      {}
+    {}
 
     override protected def protocolConnect(host: String, port: Int, user: String, password: String): Boolean =
       true

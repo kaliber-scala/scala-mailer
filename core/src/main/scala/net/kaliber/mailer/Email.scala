@@ -69,7 +69,7 @@ case class Email(subject: String, from: EmailAddress, text: String, htmlText: Op
     (root, related, alternative)
   }
 
-  private def createMimeMessage(session: net.kaliber.mailer.Session, root: Email.this.Root): javax.mail.internet.MimeMessage = {
+  private def createMimeMessage(session: Session, root: Email.this.Root): javax.mail.internet.MimeMessage = {
 
     val message = new MimeMessage(session)
     message setSubject (subject, "UTF-8")
