@@ -5,13 +5,10 @@ Scala wrapper around java mail which allows you to send emails. The default conf
 
 Installation
 ------------
+You can add the scala-mailer to SBT, by adding the following to your build.sbt file
 
 ``` scala
-  val appDependencies = Seq(
-    "net.kaliber" %% "play-mailer" % "6.0.0"
-  )
-
-  resolvers += "Kaliber Repository" at "https://jars.kaliber.io/artifactory/libs-release-local"
+  libraryDependencies += "net.kaliber" %% "play-mailer" % "6.0.0"
 ```
 
 Usage
