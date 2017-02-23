@@ -9,6 +9,17 @@ lazy val commonSettings = Seq(
   scalaVersion := "2.11.8"
 )
 
+val doNotPublishSettings = Seq(
+  Keys.`package` :=  file(""),
+  packageBin in Global :=  file(""),
+  packagedArtifacts :=  Map(),
+  publishArtifact := false,
+  publish := {},
+  bintrayRelease := (),
+  bintrayReleaseOnPublish := false,
+  bintrayUnpublish := ()
+)
+
 lazy val core = (project in file("core"))
   .settings(
     name := "scala-mailer-core"
@@ -38,12 +49,7 @@ lazy val root = (project in file("."))
     name := "scala-mailer",
     publishArtifact := false
   )
-  .settings(bintraySettings: _*)
-  .settings(
-    bintrayRelease := (),
-    bintrayReleaseOnPublish := false,
-    bintrayUnpublish := ()
-  )
+  .settings(doNotPublishSettings: _*)
   .aggregate(core, play)
 
 
@@ -85,6 +91,25 @@ lazy val bintraySettings = Seq(
         </developer>
     </developers>
     )
+)
+
+// Release
+import ReleaseTransformations._
+releasePublishArtifactsAction := PgpKeys.publishSigned.value
+releaseProcess := Seq[ReleaseStep](
+  checkSnapshotDependencies,
+  inquireVersions,
+  runClean,
+  runTest,
+  setReleaseVersion,
+  commitReleaseVersion,
+  tagRelease,
+  publishArtifacts,
+  releaseStepTask(bintrayRelease in core),
+  releaseStepTask(bintrayRelease in play),
+  setNextVersion,
+  commitNextVersion,
+  pushChanges
 )
 
 fork in Test := true
