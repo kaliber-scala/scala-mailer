@@ -1,3 +1,10 @@
+
+*This repository is no longer maintained*
+
+Just create a fork, if you want I can list it here.
+
+-------------
+
 Scala mailer module with support for Play 2.5.x
 =====================================================
 
